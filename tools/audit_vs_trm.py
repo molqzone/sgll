@@ -1,30 +1,54 @@
 #!/usr/bin/env python3
-"""Audit sgll P0 headers against the SG2002 TRM v1.02 and the SDK sources.
+"""Audit sgll device definitions and reset mapping against the TRM and SDK.
 
-Inputs (edit the constants below if paths move):
-  - TRM v1.02 text extraction, e.g. repo-root .tmp-sg2002-trm-en.txt
+Inputs (override the default locations with command-line options):
+  - TRM v1.02 文本提取 / text extraction:
+    BSP docs/reference/sg2002_trm_en_v1.02.txt
     (pymupdf extraction of the English TRM; page markers included).
   - Pinned SG200x SDK worktree (hal/cv181x/config/intr_conf.h).
-  - sgll/inc headers and driver/sg200x_clock_tree.hpp.
+  - sgll/inc headers, src/sg200x_ll_rcc.c, and driver/sg200x_clock_tree.hpp.
 
 Run:  python3 sgll/tools/audit_vs_trm.py   (exit 0 = consistent)
 
 Checks:
   1. clk_en gate bits   (TRM Tables 8.52-8.56 vs GATE_* macros)
   2. bypass bits        (Tables 8.58/8.59 vs BYPASS_* macros)
-  3. soft reset bits    (Tables 7.2-7.5 vs reset switch table)
-  4. divider offsets    (Table 8.51 vs DIV_OFF_* macros)
+  3. soft reset bits    (Tables 7.2-7.5 vs device reset location table)
+  4. divider offsets    (Table 8.51 vs CLKGEN_DIV_OFF_* constants)
   5. factor widths/init (driver clock tree vs named div leaves)
-  6. memory map         (Table 3.4 vs *_BASE macros)
-  7. C906L IRQ numbers  (SDK intr_conf.h vs LL_IRQ_* macros)
+  6. memory map         (Table 3.4 vs *_BASE constants)
+  7. C906L IRQ numbers  (SDK intr_conf.h vs IRQ_* constants)
 """
+import argparse
+import os
 import re
 import sys
+from pathlib import Path
 
-TRM = open('/home/keruth/bsp-lichee-rvnano-c906l/.tmp-sg2002-trm-en.txt').read().split('\n')
-SDK = '/mnt/d/Development/duo-sdk-c906-local/freertos/cvitek'
-SGLL = '/home/keruth/bsp-lichee-rvnano-c906l/sgll/inc'
-DRIVER = '/home/keruth/bsp-lichee-rvnano-c906l/driver/sg200x_clock_tree.hpp'
+SGLL_ROOT = Path(__file__).resolve().parents[1]
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--bsp-root', type=Path,
+                    default=Path(os.environ.get('SG200X_BSP_ROOT', SGLL_ROOT.parent)),
+                    help='BSP containing the clock tree and reference documents')
+parser.add_argument('--sdk-root', type=Path,
+                    help='SDK checkout or its freertos/cvitek directory')
+parser.add_argument('--trm', type=Path, help='Extracted SG2002 TRM v1.02 text')
+parser.add_argument('--clock-tree', type=Path, help='C++ clock-tree header to audit')
+args = parser.parse_args()
+BSP_ROOT = args.bsp_root.resolve()
+SDK = args.sdk_root or Path(os.environ.get('SG200X_SDK_DIR', BSP_ROOT / 'build/sdk-worktree'))
+if (SDK / 'freertos/cvitek').is_dir():
+    SDK = SDK / 'freertos/cvitek'
+SGLL = SGLL_ROOT / 'inc'
+DRIVER = args.clock_tree or BSP_ROOT / 'driver/sg200x_clock_tree.hpp'
+trm_path = args.trm or BSP_ROOT / 'docs/reference/sg2002_trm_en_v1.02.txt'
+for label, path, option in (
+        ('TRM text', trm_path, '--trm'),
+        ('clock tree', DRIVER, '--clock-tree'),
+        ('SDK interrupt map', SDK / 'hal/cv181x/config/intr_conf.h', '--sdk-root')):
+    if not path.is_file():
+        parser.error(f'Missing {label}: {path}; specify {option}')
+TRM = trm_path.read_text(encoding='utf-8').split('\n')
 
 issues = []
 
@@ -85,31 +109,70 @@ for m in re.finditer(r'div_clk_([a-z0-9_]+?)\s+0x([0-9a-fA-F]+)\s+divider', b):
     trm_div_off[m.group(1)] = int(m.group(2), 16)
 
 # ---------------------------------------------------------------- sgll side
-rcc = open(f'{SGLL}/sg200x_ll_rcc.h').read()
-defs = open(f'{SGLL}/sg200x_ll_defs.h').read()
+device = open(f'{SGLL}/sg2002.h').read()
+rcc_source = open(f'{SGLL}/../src/sg200x_ll_rcc.c').read()
 driver = open(DRIVER).read()
 
 def canon_clk(name):
     n = re.sub(r'^clk_', '', name.lower()).upper()
     return n.replace('RTCSYS_SRC_0', 'RTCSYS_SRC0')
 
+def expand_clkgen_reg(token):
+    token = token.strip()
+    direct = re.fullmatch(r'(\d+)U?', token)
+    if direct:
+        return int(direct.group(1))
+    m = re.fullmatch(r'CLKGEN_CLK_EN([0-4])_OFFSET', token)
+    if m:
+        return int(m.group(1))
+    m = re.fullmatch(r'CLKGEN_CLK_BYP([01])_OFFSET', token)
+    if m:
+        return int(m.group(1))
+    return integer_token(token) if 'integer_token' in globals() else None
+
 sgll_gates = {}
-for m in re.finditer(r'#define SG200X_LL_RCC_GATE_(\w+)\s+(\d)U?,\s*(\d+)U?', rcc):
-    sgll_gates[(int(m.group(2)), int(m.group(3)))] = m.group(1)
+for m in re.finditer(r'#define CLKGEN_GATE_(\w+)\s+([^,\s]+),\s*(\d+)U?', device):
+    reg = expand_clkgen_reg(m.group(2))
+    if reg is not None:
+        sgll_gates[(reg, int(m.group(3)))] = m.group(1)
 
 sgll_byp = {}
-for m in re.finditer(r'#define SG200X_LL_RCC_BYPASS_(\w+)\s+(\d)U?,\s*(\d+)U?', rcc):
-    sgll_byp[(int(m.group(2)), int(m.group(3)))] = m.group(1)
+for m in re.finditer(r'#define CLKGEN_BYPASS_(\w+)\s+([^,\s]+),\s*(\d+)U?', device):
+    reg = expand_clkgen_reg(m.group(2))
+    if reg is not None:
+        sgll_byp[(reg, int(m.group(3)))] = m.group(1)
 
 sgll_rst = {}
-locfn = re.search(r'switch \(target\)(.*?)default:', rcc, re.S).group(1)
-for m in re.finditer(r'case SG200X_LL_RESET_(\w+):\s*loc\.reg_index = (\d)U;\s*loc\.bit = (\d+)U;', locfn):
-    sgll_rst[(int(m.group(2)), int(m.group(3)))] = m.group(1)
+if 'SG2002_RESET_MAP(RESET_LOCATION)' not in rcc_source:
+    raise RuntimeError('RCC reset table must use the SG2002 device map')
+for m in re.finditer(r'X\(\s*(\w+),\s*(0x[0-9A-Fa-f]+|\d+)U?,\s*(0x[0-9A-Fa-f]+|\d+)U?\s*\)', device):
+    sgll_rst[(int(m.group(2), 0), int(m.group(3), 0))] = m.group(1)
+if len(sgll_rst) != 48:
+    raise RuntimeError('SG2002 reset coordinate map is incomplete')
 
-sgll_defs = {m.group(1): int(m.group(2), 16) for m in
-             re.finditer(r'#define (SG200X_\w+_BASE)\s+0x([0-9A-Fa-f]+)UL', defs)}
-sgll_div_off = {m.group(1).upper(): int(m.group(2), 16) for m in
-                re.finditer(r'#define SG200X_LL_RCC_DIV_OFF_(\w+)\s+0x([0-9A-Fa-f]+)UL', rcc)}
+# Device scalars are C23 constexpr declarations; feature flags remain macros.
+# These checks need literal values only, not arbitrary C expression evaluation.
+device_uints = {}
+uint_literal = r"((?:0[xX][0-9A-Fa-f']+|[0-9][0-9']*)(?:[uUlL]+)?)"
+for pattern in (
+        rf'^static constexpr auto\s+(\w+)\s*=\s*{uint_literal}\s*;',
+        rf'^#define\s+(\w+)\s+{uint_literal}\s*(?:/\*.*?\*/)?$'):
+    for m in re.finditer(pattern, device, re.M):
+        token = re.sub(r'[uUlL]+$', '', m.group(2)).replace("'", '')
+        device_uints[m.group(1)] = int(token, 0)
+
+sgll_defs = {name: value for name, value in device_uints.items()
+             if name.endswith(('_BASE', '_BASE_ADDRESS'))}
+sgll_div_off = {name.removeprefix('CLKGEN_DIV_OFF_'): value
+                for name, value in device_uints.items()
+                if name.startswith('CLKGEN_DIV_OFF_')}
+
+def integer_token(token):
+    token = token.strip()
+    if token in device_uints:
+        return device_uints[token]
+    token = re.sub(r'[uUlL]+$', '', token).replace("'", '')
+    return int(token, 0)
 
 LINUX_OWNED_GATE = re.compile(
     r'^(A53|CPU_AXI0|CPU_GIC|XTAL_A53|TPU|AHB_ROM|DDR_AXI_REG|AXI4_EMMC|EMMC|100K_EMMC|'
@@ -167,10 +230,23 @@ for (reg, bit), name in sorted(trm_byp_all.items()):
     if (reg, bit) not in sgll_byp:
         print(f'  (TRM byp_{reg}[{bit}] clk_{name} not exposed - by design)')
 
-print('=== 3. SOFT_RSTN bits: every sgll reset target must match TRM ===')
+print('=== 3. SOFT_RSTN bits: TRM and documented CV181x SDK coordinates ===')
+# cv181x-resets.h declares RST_SD1=17, while TRM Table 7.2 marks it reserved.
+# Retain this existing BSP reset mapping; no other undocumented bit is accepted.
+sdk_reset_overrides = {(0, 17): 'SD1'}
 bad = 0
+sdk_matched = 0
 for (reg, bit), got in sorted(sgll_rst.items()):
     tok = trm_rst.get((reg, bit))
+    if tok is None:
+        if sdk_reset_overrides.get((reg, bit)) == got:
+            print(f'  SDK: RESET_{got} @ rstn{reg}[{bit}] from cv181x-resets.h (TRM reserved)')
+            sdk_matched += 1
+            continue
+        print(f'  FAIL: RESET_{got} @ rstn{reg}[{bit}] has no TRM or SDK coordinate')
+        issues.append(f'reset not documented: {got} rstn{reg}[{bit}]')
+        bad += 1
+        continue
     base = re.sub(r'\d+$', '', tok.upper())
     idx = re.search(r'(\d+)$', tok)
     canon = base + (idx.group(1) if idx else '')
@@ -184,7 +260,8 @@ excluded = [(reg, bit, tok) for (reg, bit), tok in trm_rst.items() if (reg, bit)
 linux_owned = [x for x in excluded if re.sub(r'\d+$', '', x[2].upper()) in LINUX_OWNED_RST or
                 x[2].upper() in LINUX_OWNED_RST]
 other = [x for x in excluded if x not in linux_owned]
-print(f'  sgll reset targets: {len(sgll_rst)}, all TRM-matched: {bad == 0}')
+print(f'  sgll reset targets: {len(sgll_rst)}, TRM: {len(sgll_rst) - sdk_matched - bad}, '
+      f'documented SDK overrides: {sdk_matched}, mismatches: {bad}')
 print(f'  TRM reset bits not in sgll: {len(excluded)} (Linux-owned: {len(linux_owned)})')
 for reg, bit, tok in other:
     print(f'  UNCLASSIFIED rstn{reg}[{bit}] {tok}')
@@ -213,16 +290,23 @@ for name, off in sorted(trm_div_off.items(), key=lambda kv: kv[1]):
 
 print('=== 5. factor widths and initial values vs driver clock tree ===')
 driver_div = {}
-for m in re.finditer(r'Divide\((0[xX][0-9A-Fa-f]+)u,\s*(\d+)u,\s*(\d+)u,\s*(\d+)u\)', driver):
-    driver_div[int(m.group(1), 16)] = (int(m.group(3)), int(m.group(4)))
+for m in re.finditer(r'Divide\s*\(([^()]*)\)', driver, re.S):
+    args = [arg.strip() for arg in m.group(1).split(',')]
+    if len(args) != 4:
+        continue
+    try:
+        driver_div[integer_token(args[0])] = (integer_token(args[2]), integer_token(args[3]))
+    except ValueError:
+        continue
 leaf_off = {'AXI4': '0x0b8', 'AXI6': '0x0bc', '1M': '0x0fc', 'SPI': '0x100',
             'I2C': '0x104', 'PWM_SRC': '0x120'}
 for leaf, off in leaf_off.items():
-    m = re.search(rf'#define SG200X_LL_RCC_DIV_{leaf}\s+SG200X_LL_RCC_DIV_OFF_{leaf},\s*(\d+)U', rcc)
-    mi = re.search(rf'#define SG200X_LL_RCC_{leaf}_INITIAL_FACTOR\s+(\d+)U', rcc)
+    device_width = device_uints.get(f'CLKGEN_DIV_{leaf}_FACTOR_WIDTH')
+    device_init = device_uints.get(f'CLKGEN_{leaf}_INITIAL_FACTOR')
     width, init = driver_div.get(int(off, 16), (None, None))
-    ok = m and mi and int(m.group(1)) == width and int(mi.group(1)) == init
-    print(f'  {leaf:<8} width {m.group(1) if m else "?"} init {mi.group(1) if mi else "?"} '
+    ok = (device_width is not None and device_init is not None and
+          device_width == width and device_init == init)
+    print(f'  {leaf:<8} width {device_width} init {device_init} '
           f'driver(width {width}, init {init}): {"OK" if ok else "FAIL"}')
     if not ok:
         issues.append(f'div leaf {leaf} width/init')
@@ -263,7 +347,7 @@ for base, name in sorted(trm_map.items()):
     if 'Reserved' in name or alias.get(name, name.upper()) in SKIP_MAP:
         continue
     canon = alias.get(name, name.upper().replace(' ', '_').replace('/', '_'))
-    mac = f'SG200X_{canon}_BASE'
+    mac = 'PLIC_BASE_ADDRESS' if canon == 'PLIC' else f'{canon}_BASE'
     val = sgll_defs.get(mac)
     if val is None:
         print(f'  (TRM {name} 0x{base:08X}: no {mac} - ok if out of scope)')
@@ -274,7 +358,8 @@ for base, name in sorted(trm_map.items()):
         checked += 1
 extra = []
 for mac, val in sgll_defs.items():
-    canon = mac[len('SG200X_'):-len('_BASE')]  # keys carry the full prefix
+    suffix = '_BASE_ADDRESS' if mac.endswith('_BASE_ADDRESS') else '_BASE'
+    canon = mac[:-len(suffix)]
     if canon == 'PLL_G2' and val == 0x03002800:
         checked += 1
         continue
@@ -309,8 +394,8 @@ sdk_irq = {}
 for m in re.finditer(r'#define\s+(\w+)\s+(\d+)\s*$', open(f'{SDK}/hal/cv181x/config/intr_conf.h').read(), re.M):
     if m.group(1) in irq_alias:
         sdk_irq[irq_alias[m.group(1)]] = int(m.group(2))
-sgll_irq = {m.group(1): int(m.group(2)) for m in
-            re.finditer(r'#define SG200X_LL_IRQ_(\w+)\s+(\d+)UL', defs)}
+sgll_irq = {name.removeprefix('IRQ_'): value for name, value in device_uints.items()
+            if name.startswith('IRQ_')}
 bad = 0
 for name, val in sorted(sdk_irq.items()):
     got = sgll_irq.get(name)
@@ -327,7 +412,7 @@ for name in sgll_irq:
         print(f'  FAIL: sgll IRQ_{name} not routed to C906L in SDK')
         issues.append(f'irq not in SDK {name}')
         bad += 1
-print(f'  SDK C906L-routed sources: {len(sdk_irq)}, sgll macros: {len(sgll_irq)}, bad: {bad}')
+print(f'  SDK C906L-routed sources: {len(sdk_irq)}, sgll constants: {len(sgll_irq)}, bad: {bad}')
 
 print()
 print('=== RESULT ===')
