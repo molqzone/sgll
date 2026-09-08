@@ -568,6 +568,9 @@ static constexpr auto PINMUX_SD1_CLK_OFFSET = 0x0E4UL;
 /// @brief EMMC_DAT2 选择 GPIOA26 的复用编码。
 ///        Mux encoding selecting GPIOA26 on EMMC_DAT2.
 static constexpr auto PINMUX_EMMC_DAT2_GPIOA26_FUNCTION = 3U;
+/// @brief EMMC_DAT2 对应的 GPIOA26 位掩码。
+///        GPIOA26 mask corresponding to EMMC_DAT2.
+static constexpr auto PINMUX_EMMC_DAT2_GPIOA26_MASK = (1UL << 26);
 /// @brief SD1_D3 选择 SPI2_CS 的复用编码。
 ///        Mux encoding selecting SPI2_CS on SD1_D3.
 static constexpr auto PINMUX_SD1_D3_SPI2_CS_FUNCTION = 1U;
