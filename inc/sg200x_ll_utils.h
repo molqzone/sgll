@@ -1,65 +1,95 @@
-/*
- * sg200x_ll_utils.h - MMIO primitives and bit-field helpers.
+/**
+ * @file sg200x_ll_utils.h
+ * @brief 纯数值位操作与字段编码辅助接口。
+ *        Pure value bit-operation and field-encoding helpers.
+ * @ingroup SGLL_UTILS
  *
- * Zero dependencies; only <stdint.h>.  Pure C, no asm (fences live in
- * sg200x_ll_csr.h).
- *
- * Access contract (driver/sg200x_mmio.hpp keeps the same rule): every
- * peripheral access is a 32-bit volatile access.  The DesignWare blocks
- * sit behind the AXI6-to-APB bridge and the TRM does not document byte or
- * halfword access semantics, so sgll never emits them.
- *
- * The read-modify-write macros are NOT atomic across cores.  Register
- * ownership follows the board contract: Linux owns its clock/reset/DMA
- * partitions and C906L firmware owns its own; single-writer discipline is
- * the caller's responsibility (see PLAN section 7).
+ * @note 所有函数只计算数值；不提供通用 MMIO 包装，也不读取或写入硬件。
+ *       All functions operate on values only; they neither provide generic MMIO wrappers nor access hardware.
  */
+
+/**
+ * @defgroup SGLL_UTILS 位字段数值运算 / Bit-field value operations
+ * @ingroup SGLL
+ */
+
 #pragma once
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-#define SG200X_LL_STATIC_ASSERT(condition, message) static_assert((condition), message)
-#else
-#define SG200X_LL_STATIC_ASSERT(condition, message) _Static_assert((condition), message)
-#endif
+/**
+ * @brief 构造本机 unsigned long 类型的单比特掩码。
+ *        Build a single-bit mask of native unsigned long type.
+ * @ingroup SGLL_UTILS
+ *
+ * @param n 零起始位号，必须小于 unsigned long 的位宽。
+ *        Zero-based bit index below the width of unsigned long.
+ * @return 仅位 n 置位的掩码。
+ *         Mask with only bit n set.
+ */
+#define SGLL_BIT(n) (1UL << (n))
+/**
+ * @brief 构造 32 位连续字段掩码。
+ *        Build a contiguous 32-bit field mask.
+ * @ingroup SGLL_UTILS
+ *
+ * @param shift 字段最低有效位位置，小于 32。
+ *        Least-significant field-bit position, below 32.
+ * @param width 字段位数，不大于 32 - shift。
+ *        Field bit count, no greater than 32 - shift.
+ * @return 指定字段的掩码。
+ *         Mask of the selected field.
+ */
+#define SGLL_MASK(shift, width) ((uint32_t)((((uint64_t)1U << (width)) - 1U) << (shift)))
 
-/* ------------------------------------------------------------------ */
-/* Register access                                                     */
-/* ------------------------------------------------------------------ */
-
-#define SG200X_LL_REG32(addr) (*(volatile uint32_t *)(uintptr_t)(addr))
-
-#define SG200X_LL_REG32_AT(base, offset) SG200X_LL_REG32((uintptr_t)(base) + (uintptr_t)(offset))
-
-#define SG200X_LL_READ_REG(reg) (reg)
-#define SG200X_LL_WRITE_REG(reg, value) ((reg) = (value))
-
-/* ------------------------------------------------------------------ */
-/* Bit and field construction                                          */
-/* ------------------------------------------------------------------ */
-
-#define SG200X_LL_BIT(n) (1UL << (n))
-#define SG200X_LL_MASK(shift, width) (((1UL << (width)) - 1UL) << (shift))
-
-/* Read-modify-write helpers, CMSIS-LL style: REG is a volatile lvalue. */
-#define SG200X_LL_SET_BITS(reg, mask) ((reg) |= (mask))
-#define SG200X_LL_CLEAR_BITS(reg, mask) ((reg) &= ~(uint32_t)(mask))
-#define SG200X_LL_MODIFY_REG(reg, clear_mask, set_mask)                                                      \
-    ((reg) = (((reg) & ~(uint32_t)(clear_mask)) | (set_mask)))
-#define SG200X_LL_IS_BIT_SET(reg, mask) (((reg) & (mask)) != 0U)
-
-/* Extract a bit field from a register value. */
-static inline uint32_t sg200x_ll_field_get(uint32_t value, uint32_t shift, uint32_t width)
+/**
+ * @brief 从 32 位数值中提取位字段。
+ *        Extract a bit field from a 32-bit value.
+ * @ingroup SGLL_UTILS
+ *
+ * @param value 待提取字段的原始 32 位数值。
+ *        Original 32-bit value containing the field.
+ * @param shift 字段最低有效位的零起始位置。
+ *        Zero-based position of the field's least-significant bit.
+ * @param width 字段位数，且 shift + width 不超过 32。
+ *        Field bit count; shift plus width must not exceed 32.
+ * @return 右对齐的字段值。
+ *         Right-aligned field value.
+ * @pre shift 小于 32，width 不大于 32 - shift；调用者负责范围有效性。
+ *      shift must be below 32 and width no greater than 32 - shift; the caller validates ranges.
+ * @note 仅进行数值运算，不读取或写入寄存器。
+ *       Perform value operations only; no registers are read or written.
+ */
+static inline uint32_t sgll_field_get(uint32_t value, uint32_t shift, uint32_t width)
 {
-    return (value >> shift) & ((1UL << width) - 1UL);
+    return (value >> shift) & (uint32_t)(((uint64_t)1U << width) - 1U);
 }
 
-/* Build a register value with `field_value` placed into one field,
- * preserving everything outside the field mask. */
+/**
+ * @brief 替换 32 位数值中的指定位字段。
+ *        Replace a selected bit field in a 32-bit value.
+ * @ingroup SGLL_UTILS
+ *
+ * @param reg_value 待替换字段的原始 32 位数值。
+ *        Original 32-bit value whose field is replaced.
+ * @param shift 字段最低有效位的零起始位置。
+ *        Zero-based position of the field's least-significant bit.
+ * @param width 字段位数，且 shift + width 不超过 32。
+ *        Field bit count; shift plus width must not exceed 32.
+ * @param field_value 右对齐的新字段值。
+ *        New right-aligned field value.
+ * @return 替换后的数值，字段外的位保持不变。
+ *         Updated value with bits outside the field preserved.
+ * @pre shift 小于 32，width 不大于 32 - shift；调用者负责范围有效性。
+ *      shift must be below 32 and width no greater than 32 - shift; the caller validates ranges.
+ * @note 仅进行数值运算，不读取或写入寄存器。
+ *       Perform value operations only; no registers are read or written.
+ * @note field_value 超出字段宽度的高位会被截断。
+ *       High bits of field_value outside the field width are discarded.
+ */
 static inline uint32_t
-sg200x_ll_field_prepare(uint32_t reg_value, uint32_t shift, uint32_t width, uint32_t field_value)
+sgll_field_prepare(uint32_t reg_value, uint32_t shift, uint32_t width, uint32_t field_value)
 {
-    const uint32_t mask = ((1UL << width) - 1UL) << shift;
+    const uint32_t mask = SGLL_MASK(shift, width);
     return (reg_value & ~mask) | ((field_value << shift) & mask);
 }
