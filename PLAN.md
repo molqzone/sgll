@@ -341,7 +341,7 @@ sgll 统一要求 C23（`-std=c23` 或等效选项），并在 C、C++ 两种消
 ### 8.2 可选（按需，不排期）
 
 `sg200x_ll_efuse.h` 保留骨架。`sg200x_ll_mbox.h/.c` 已实现共享 DDR 单槽传输，
-由调用者定义头部、状态字和值；相机 ABI 和 CRC 校验在 `User/camera_mailbox.cpp`。
+由调用者定义头部、状态字和值；相机 ABI 和 CRC 校验在 `User/vt.hpp`。
 APB/RTC 硬件邮箱通道仍按实际需要单独实现：
 
 | 模块 | 基址 | 说明 |
