@@ -13,12 +13,16 @@ cmake_minimum_required(VERSION 3.22)
 project(sgll LANGUAGES C)
 
 add_library(sgll STATIC
+  src/sg200x_ll_adc.c
   src/sg200x_ll_csr.c
   src/sg200x_ll_dma.c
   src/sg200x_ll_i2c.c
+  src/sg200x_ll_mbox.c
+  src/sg200x_ll_pwm.c
   src/sg200x_ll_rcc.c
   src/sg200x_ll_spi.c
   src/sg200x_ll_uart.c
+  src/sg200x_ll_wdt.c
 )
 target_include_directories(sgll PUBLIC
   "${CMAKE_CURRENT_SOURCE_DIR}"
