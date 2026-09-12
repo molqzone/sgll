@@ -12,6 +12,7 @@
 #pragma once
 
 #include "inc/sg2002.h"
+#include "inc/sgll_core.h"
 
 #include "inc/sg200x_ll_adc.h"
 #include "inc/sg200x_ll_csr.h"

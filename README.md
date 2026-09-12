@@ -45,14 +45,21 @@ SGLL 不保存外设运行状态，不注册 RTOS 中断，也不替调用者分
 ```cmake
 add_subdirectory(sgll)
 target_link_libraries(firmware PRIVATE sgll)
-
-# RISC-V 构建所需的 SDK CSI core 头目录。
-target_include_directories(sgll SYSTEM PUBLIC "${SDK_ARCH_INCLUDE_DIR}")
 ```
 
-`sgll` 目标生成静态库 `libsgll.a`，公开头文件路径和 C23 要求。
-独立配置也可以传入 `-DSGLL_CORE_INCLUDE_DIR=/path/to/sdk/include/arch`。
+`sgll` 目标生成静态库 `libsgll.a`，公开头文件路径和 C23 要求。RISC-V 构建
+不需要任何 SDK 头文件：CSR、中断与时间原语由 `inc/sgll_core.h` 的内联汇编提供。
 只使用内联寄存器原语时，静态链接器无需提取未引用的实现对象。
+
+需要与厂商定义做对照时，可切换到 SDK 后端编译同一批原语：
+
+```cmake
+# A/B 对照构建：-DSGLL_CORE_BACKEND_SDK=ON
+#                -DSGLL_CORE_INCLUDE_DIR=/path/to/sdk/arch/riscv64/include
+```
+
+两个后端提供同名原语与相同的寄存器语义，`sgll/tests/run.py` 会用 `--core-include`
+编译 `tests/core_probe.c` 两侧并逐符号比较生成的指令。
 
 使用复合操作的工程需链接 `sgll`。驱动中的旧通用 MMIO 调用改为对应外设 LL 接口，
 旧屏障调用改用 `sgll_csr_fence_io()`。

@@ -123,7 +123,8 @@ sgll/
 ```
 sgll.h                    ← umbrella，包含 SG2002 设备头和全部 LL 头
  ├─ inc/sg2002.h          ← 唯一芯片设备头
- ├─ sg200x_ll_csr.h      ← RISC-V 构建依赖 CSI core_rv64.h
+ ├─ sgll_core.h           ← CSR/中断/时间内建原语，自带汇编；可选 SDK 对照后端
+ ├─ sg200x_ll_csr.h      ← sgll_core + sg2002；缓存指令字与 fence.i
  ├─ sg200x_ll_utils.h    ← 零依赖
  ├─ sg200x_ll_plic.h     ← csr + utils + sg2002
  ├─ sg200x_ll_rcc.h      ← csr + utils + sg2002
@@ -265,6 +266,12 @@ sgll 统一要求 C23（`-std=c23` 或等效选项），并在 C、C++ 两种消
 > （rstn2[22-24]）；补 AXI4/AXI6 初始分频值宏与因子宽度来源说明（TRM 只写
 > [20:16]，宽度以 driver 已验证值为准：axi4/axi6/i2c=4 位、
 > 1m/spi/pwm_src=6 位）。
+>
+> **（2026-09-12 更新）** 上条数字是当时的快照（复位 46、分频偏移 15）；此后
+> sgll 继续补齐定义，最终为复位 48 个目标、分频偏移 20/20，其余不变，仍全部
+> exit 0。定义迁移完成后 `sgll/tools/audit_vs_trm.py` 已删除；最终基线与两项
+> 随之失去自动守护的检查（BSP 时钟树 ↔ 分频常量、`IRQ_*` ↔ 固定 SDK 的
+> `intr_conf.h`）记录在 `tests/README.md` 的 "Retired: TRM consistency audit"。
 > 待做：板上 PLIC 进出/时钟分支冒烟（走 firmware/deploy 流水线）。
 | P1 | pinmux 原语 + gpio | Ch21.5 | LL_GPIO 点 LED（GPIOA_14）+ 按键输入 |
 | P2 | uart | Ch21.2 | 轮询/中断收发打印（板已用 UART0/1 出日志） |
@@ -286,8 +293,10 @@ sgll 统一要求 C23（`-std=c23` 或等效选项），并在 C、C++ 两种消
 ## 5. 构建集成
 
 - `sgll/CMakeLists.txt`：`add_library(sgll STATIC ...)`，编译 CSR、DMA、RCC
-  以及 SPI、I2C、UART、MBOX 的 C23 源文件，公开根目录和 `inc/` 头文件路径。`SGLL_CORE_INCLUDE_DIR`
-  可指定 CSI core 头目录，也可由父项目通过 `target_include_directories` 提供。
+  以及 SPI、I2C、UART、MBOX 的 C23 源文件，公开根目录和 `inc/` 头文件路径。
+  RISC-V 构建不需要 SDK 头：`inc/sgll_core.h` 自带 CSR/中断/时间内联汇编。
+  可选 `-DSGLL_CORE_BACKEND_SDK=ON -DSGLL_CORE_INCLUDE_DIR=<sdk arch dir>`
+  切到厂商 `core_rv64.h` 对照后端做 A/B 构建。
 - 接入点：SDK overlay 的
   `sdk/sg200x/overlay/freertos/cvitek/task/xrobot/CMakeLists.txt` 里
   `add_subdirectory("${SG200X_BSP_ROOT}/sgll" sgll)`，并

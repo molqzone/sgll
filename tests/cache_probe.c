@@ -3,8 +3,9 @@
  * @brief 使用固件工具链编译的缓存与邮箱探针入口。
  *        Cache and mailbox probe entry points compiled with the firmware toolchain.
  *
- * @note 使用实际 SDK 头；cache_linux.c 在 QEMU 捕获 C906 指令时观察 a0。
- *       Use real SDK headers; cache_linux.c observes a0 when QEMU traps C906 instructions.
+ * @note 缓存指令字由源码直接持有，不需要 SDK 头；cache_linux.c 在 QEMU 捕获 C906 指令时观察 a0。
+ *       The cache instruction words live in the sources and need no SDK header; cache_linux.c observes a0 when
+ * QEMU traps C906 instructions.
  */
 #include "inc/sg200x_ll_csr.h"
 #include "inc/sg200x_ll_mbox.h"
