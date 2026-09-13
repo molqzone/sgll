@@ -12,14 +12,14 @@ typedef struct
     uint32_t clock_divider; ///< 分频编码 0 至 15，实际分频为编码加一。 Divider encoding zero through fifteen;
                             ///< divisor is encoding plus one.
     bool external_reference; ///< 使用外部 VDD18A 参考电压。 Use external VDD18A reference voltage.
-} sgll_adc_init_t;
+} sg200x_ll_adc_init_t;
 
 /**
  * @brief 按电源域获取 SARADC 实例 / Get a SARADC instance by power domain.
  * @param index 零为主域，一为 RTC 域 / Zero for the main domain; one for the RTC domain.
  * @return 实例指针；无效编号返回空指针 / Instance pointer; null for an invalid index.
  */
-static inline SARADC_Type *sgll_adc_get(uint32_t index)
+static inline SARADC_Type *sg200x_ll_adc_get(uint32_t index)
 {
     return index == 0U ? SARADC_REGS : index == 1U ? RTC_SARADC_REGS : NULL;
 }
@@ -29,7 +29,7 @@ static inline SARADC_Type *sgll_adc_get(uint32_t index)
  * @param adc 主域或 RTC 域 SARADC 实例 / Main-domain or RTC-domain SARADC instance.
  * @return 转换活动时返回 true / True while a conversion is active.
  */
-static inline bool sgll_adc_is_busy(const SARADC_Type *adc)
+static inline bool sg200x_ll_adc_is_busy(const SARADC_Type *adc)
 {
     return (adc->STATUS & SARADC_STATUS_BUSY_BIT) != 0U;
 }
@@ -45,7 +45,7 @@ static inline bool sgll_adc_is_busy(const SARADC_Type *adc)
  * @pre 已等待转换结束；本函数不等待硬件。
  *        Conversion completion has been awaited; this function does not wait for hardware.
  */
-static inline bool sgll_adc_result_read(const SARADC_Type *adc, uint32_t channel, uint16_t *value)
+static inline bool sg200x_ll_adc_result_read(const SARADC_Type *adc, uint32_t channel, uint16_t *value)
 {
     if (adc == NULL || value == NULL || channel == 0U || channel > SARADC_CHANNEL_COUNT)
         return false;
@@ -66,7 +66,7 @@ extern "C"
      * @param config 接收默认配置，可为空 / Destination for defaults; may be null.
      * @note 默认采用十六分频及内部参考电压 / Defaults select divide-by-sixteen and the internal reference.
      */
-    void sgll_adc_struct_init(sgll_adc_init_t *config);
+    void sg200x_ll_adc_struct_init(sg200x_ll_adc_init_t *config);
 
     /**
      * @brief 初始化一个空闲 SARADC 实例 / Initialize one idle SARADC instance.
@@ -77,7 +77,7 @@ extern "C"
      * @note 保留时序寄存器的保留位；禁止并清除中断，不触发转换。
      *        Preserves reserved timing bits; disables and clears interrupts without starting a conversion.
      */
-    bool sgll_adc_init(SARADC_Type *adc, const sgll_adc_init_t *config);
+    bool sg200x_ll_adc_init(SARADC_Type *adc, const sg200x_ll_adc_init_t *config);
 
     /**
      * @brief 选择物理通道并触发一次转换 / Select a physical channel and trigger one conversion.
@@ -90,7 +90,7 @@ extern "C"
      *        Orders channel selection, interrupt clear, and trigger; hardware clears the old result-valid
      *        bit.
      */
-    bool sgll_adc_start(SARADC_Type *adc, uint32_t channel);
+    bool sg200x_ll_adc_start(SARADC_Type *adc, uint32_t channel);
 
     /**
      * @brief 有界等待 SARADC 空闲 / Wait for SARADC idle with a bounded attempt count.
@@ -99,7 +99,7 @@ extern "C"
      * @return 观察到空闲返回 true；实例无效或超时返回 false。
      *        True when idle is observed; false for an invalid instance or timeout.
      */
-    bool sgll_adc_wait_idle(const SARADC_Type *adc, uint32_t attempts);
+    bool sg200x_ll_adc_wait_idle(const SARADC_Type *adc, uint32_t attempts);
 
 #ifdef __cplusplus
 }

@@ -13,7 +13,7 @@
  * @param index 实例编号，范围为 0 到 3 / Instance index from 0 through 3.
  * @return 实例指针；编号无效时返回空指针 / Instance pointer, or null for an invalid index.
  */
-static inline spi_t *sgll_spi_get(uint32_t index)
+static inline spi_t *sg200x_ll_spi_get(uint32_t index)
 {
     switch (index)
     {
@@ -36,7 +36,7 @@ static inline spi_t *sgll_spi_get(uint32_t index)
  * @param spi SPI 寄存器实例 / SPI register instance.
  * @return DR[0] 的地址，可用于 DMA 外设地址 / Address of DR[0], suitable as a DMA peripheral address.
  */
-static inline uintptr_t sgll_spi_data_address(const spi_t *spi) { return (uintptr_t)&spi->DR[0]; }
+static inline uintptr_t sg200x_ll_spi_data_address(const spi_t *spi) { return (uintptr_t)&spi->DR[0]; }
 
 /**
  * @brief SPI 控制帧位数减 1 的 CFS 编码 / SPI CFS encoding equal to control-frame bit count minus one.
@@ -44,43 +44,43 @@ static inline uintptr_t sgll_spi_data_address(const spi_t *spi) { return (uintpt
 typedef enum
 {
 
-    SGLL_SPI_CONTROL_FRAME_SIZE_1_BIT = 0U, ///< 1 位控制帧。 1-bit control frame.
-    SGLL_SPI_CONTROL_FRAME_SIZE_2_BIT,      ///< 2 位控制帧。 2-bit control frame.
-    SGLL_SPI_CONTROL_FRAME_SIZE_3_BIT,      ///< 3 位控制帧。 3-bit control frame.
-    SGLL_SPI_CONTROL_FRAME_SIZE_4_BIT,      ///< 4 位控制帧。 4-bit control frame.
-    SGLL_SPI_CONTROL_FRAME_SIZE_5_BIT,      ///< 5 位控制帧。 5-bit control frame.
-    SGLL_SPI_CONTROL_FRAME_SIZE_6_BIT,      ///< 6 位控制帧。 6-bit control frame.
-    SGLL_SPI_CONTROL_FRAME_SIZE_7_BIT,      ///< 7 位控制帧。 7-bit control frame.
-    SGLL_SPI_CONTROL_FRAME_SIZE_8_BIT,      ///< 8 位控制帧。 8-bit control frame.
-    SGLL_SPI_CONTROL_FRAME_SIZE_9_BIT,      ///< 9 位控制帧。 9-bit control frame.
-    SGLL_SPI_CONTROL_FRAME_SIZE_10_BIT,     ///< 10 位控制帧。 10-bit control frame.
-    SGLL_SPI_CONTROL_FRAME_SIZE_11_BIT,     ///< 11 位控制帧。 11-bit control frame.
-    SGLL_SPI_CONTROL_FRAME_SIZE_12_BIT,     ///< 12 位控制帧。 12-bit control frame.
-    SGLL_SPI_CONTROL_FRAME_SIZE_13_BIT,     ///< 13 位控制帧。 13-bit control frame.
-    SGLL_SPI_CONTROL_FRAME_SIZE_14_BIT,     ///< 14 位控制帧。 14-bit control frame.
-    SGLL_SPI_CONTROL_FRAME_SIZE_15_BIT,     ///< 15 位控制帧。 15-bit control frame.
-    SGLL_SPI_CONTROL_FRAME_SIZE_16_BIT,     ///< 16 位控制帧。 16-bit control frame.
-} sgll_spi_control_frame_size_t;
+    LL_SPI_CONTROL_FRAME_SIZE_1_BIT = 0U, ///< 1 位控制帧。 1-bit control frame.
+    LL_SPI_CONTROL_FRAME_SIZE_2_BIT,      ///< 2 位控制帧。 2-bit control frame.
+    LL_SPI_CONTROL_FRAME_SIZE_3_BIT,      ///< 3 位控制帧。 3-bit control frame.
+    LL_SPI_CONTROL_FRAME_SIZE_4_BIT,      ///< 4 位控制帧。 4-bit control frame.
+    LL_SPI_CONTROL_FRAME_SIZE_5_BIT,      ///< 5 位控制帧。 5-bit control frame.
+    LL_SPI_CONTROL_FRAME_SIZE_6_BIT,      ///< 6 位控制帧。 6-bit control frame.
+    LL_SPI_CONTROL_FRAME_SIZE_7_BIT,      ///< 7 位控制帧。 7-bit control frame.
+    LL_SPI_CONTROL_FRAME_SIZE_8_BIT,      ///< 8 位控制帧。 8-bit control frame.
+    LL_SPI_CONTROL_FRAME_SIZE_9_BIT,      ///< 9 位控制帧。 9-bit control frame.
+    LL_SPI_CONTROL_FRAME_SIZE_10_BIT,     ///< 10 位控制帧。 10-bit control frame.
+    LL_SPI_CONTROL_FRAME_SIZE_11_BIT,     ///< 11 位控制帧。 11-bit control frame.
+    LL_SPI_CONTROL_FRAME_SIZE_12_BIT,     ///< 12 位控制帧。 12-bit control frame.
+    LL_SPI_CONTROL_FRAME_SIZE_13_BIT,     ///< 13 位控制帧。 13-bit control frame.
+    LL_SPI_CONTROL_FRAME_SIZE_14_BIT,     ///< 14 位控制帧。 14-bit control frame.
+    LL_SPI_CONTROL_FRAME_SIZE_15_BIT,     ///< 15 位控制帧。 15-bit control frame.
+    LL_SPI_CONTROL_FRAME_SIZE_16_BIT,     ///< 16 位控制帧。 16-bit control frame.
+} sg200x_ll_spi_control_frame_size_t;
 
 /**
  * @brief SPI TMOD 传输模式编码 / SPI TMOD transfer-mode encoding.
  */
 typedef enum
 {
-    SGLL_SPI_TRANSFER_MODE_TX_RX = 0U,       ///< 全双工收发。 Full-duplex transmit and receive.
-    SGLL_SPI_TRANSFER_MODE_TX_ONLY = 1U,     ///< 仅发送。 Transmit only.
-    SGLL_SPI_TRANSFER_MODE_RX_ONLY = 2U,     ///< 仅接收。 Receive only.
-    SGLL_SPI_TRANSFER_MODE_EEPROM_READ = 3U, ///< EEPROM 读取模式。 EEPROM-read mode.
-} sgll_spi_transfer_mode_t;
+    LL_SPI_TRANSFER_MODE_TX_RX = 0U,       ///< 全双工收发。 Full-duplex transmit and receive.
+    LL_SPI_TRANSFER_MODE_TX_ONLY = 1U,     ///< 仅发送。 Transmit only.
+    LL_SPI_TRANSFER_MODE_RX_ONLY = 2U,     ///< 仅接收。 Receive only.
+    LL_SPI_TRANSFER_MODE_EEPROM_READ = 3U, ///< EEPROM 读取模式。 EEPROM-read mode.
+} sg200x_ll_spi_transfer_mode_t;
 
 /**
  * @brief SPI 空闲时钟极性 / SPI idle-clock polarity.
  */
 typedef enum
 {
-    SGLL_SPI_CLOCK_POLARITY_LOW = 0U,  ///< 时钟空闲为低电平。 Clock idles low.
-    SGLL_SPI_CLOCK_POLARITY_HIGH = 1U, ///< 时钟空闲为高电平。 Clock idles high.
-} sgll_spi_clock_polarity_t;
+    LL_SPI_CLOCK_POLARITY_LOW = 0U,  ///< 时钟空闲为低电平。 Clock idles low.
+    LL_SPI_CLOCK_POLARITY_HIGH = 1U, ///< 时钟空闲为高电平。 Clock idles high.
+} sg200x_ll_spi_clock_polarity_t;
 
 /**
  * @brief SPI 数据采样边沿选择 / SPI data-sampling edge selection.
@@ -88,19 +88,19 @@ typedef enum
 typedef enum
 {
 
-    SGLL_SPI_CLOCK_PHASE_FIRST_EDGE = 0U, ///< 第一边沿采样，SCPH=0。 Sample on the first edge, SCPH=0.
-    SGLL_SPI_CLOCK_PHASE_SECOND_EDGE = 1U, ///< 第二边沿采样，SCPH=1。 Sample on the second edge, SCPH=1.
-} sgll_spi_clock_phase_t;
+    LL_SPI_CLOCK_PHASE_FIRST_EDGE = 0U,  ///< 第一边沿采样，SCPH=0。 Sample on the first edge, SCPH=0.
+    LL_SPI_CLOCK_PHASE_SECOND_EDGE = 1U, ///< 第二边沿采样，SCPH=1。 Sample on the second edge, SCPH=1.
+} sg200x_ll_spi_clock_phase_t;
 
 /**
  * @brief SPI 串行帧格式选择 / SPI serial frame-format selection.
  */
 typedef enum
 {
-    SGLL_SPI_FRAME_FORMAT_MOTOROLA = 0U,     ///< Motorola SPI 格式。 Motorola SPI format.
-    SGLL_SPI_FRAME_FORMAT_TI_SSP = 1U,       ///< TI 同步串行格式。 TI synchronous serial format.
-    SGLL_SPI_FRAME_FORMAT_NS_MICROWIRE = 2U, ///< NS Microwire 格式。 NS Microwire format.
-} sgll_spi_frame_format_t;
+    LL_SPI_FRAME_FORMAT_MOTOROLA = 0U,     ///< Motorola SPI 格式。 Motorola SPI format.
+    LL_SPI_FRAME_FORMAT_TI_SSP = 1U,       ///< TI 同步串行格式。 TI synchronous serial format.
+    LL_SPI_FRAME_FORMAT_NS_MICROWIRE = 2U, ///< NS Microwire 格式。 NS Microwire format.
+} sg200x_ll_spi_frame_format_t;
 
 /**
  * @brief SPI 数据帧位数减 1 的 DFS 编码 / SPI DFS encoding equal to data-frame bit count minus one.
@@ -108,47 +108,48 @@ typedef enum
 typedef enum
 {
 
-    SGLL_SPI_DATA_FRAME_SIZE_4_BIT = 3U, ///< 4 位数据帧。 4-bit data frame.
-    SGLL_SPI_DATA_FRAME_SIZE_5_BIT,      ///< 5 位数据帧。 5-bit data frame.
-    SGLL_SPI_DATA_FRAME_SIZE_6_BIT,      ///< 6 位数据帧。 6-bit data frame.
-    SGLL_SPI_DATA_FRAME_SIZE_7_BIT,      ///< 7 位数据帧。 7-bit data frame.
-    SGLL_SPI_DATA_FRAME_SIZE_8_BIT,      ///< 8 位数据帧。 8-bit data frame.
-    SGLL_SPI_DATA_FRAME_SIZE_9_BIT,      ///< 9 位数据帧。 9-bit data frame.
-    SGLL_SPI_DATA_FRAME_SIZE_10_BIT,     ///< 10 位数据帧。 10-bit data frame.
-    SGLL_SPI_DATA_FRAME_SIZE_11_BIT,     ///< 11 位数据帧。 11-bit data frame.
-    SGLL_SPI_DATA_FRAME_SIZE_12_BIT,     ///< 12 位数据帧。 12-bit data frame.
-    SGLL_SPI_DATA_FRAME_SIZE_13_BIT,     ///< 13 位数据帧。 13-bit data frame.
-    SGLL_SPI_DATA_FRAME_SIZE_14_BIT,     ///< 14 位数据帧。 14-bit data frame.
-    SGLL_SPI_DATA_FRAME_SIZE_15_BIT,     ///< 15 位数据帧。 15-bit data frame.
-    SGLL_SPI_DATA_FRAME_SIZE_16_BIT,     ///< 16 位数据帧。 16-bit data frame.
-} sgll_spi_data_frame_size_t;
+    LL_SPI_DATA_FRAME_SIZE_4_BIT = 3U, ///< 4 位数据帧。 4-bit data frame.
+    LL_SPI_DATA_FRAME_SIZE_5_BIT,      ///< 5 位数据帧。 5-bit data frame.
+    LL_SPI_DATA_FRAME_SIZE_6_BIT,      ///< 6 位数据帧。 6-bit data frame.
+    LL_SPI_DATA_FRAME_SIZE_7_BIT,      ///< 7 位数据帧。 7-bit data frame.
+    LL_SPI_DATA_FRAME_SIZE_8_BIT,      ///< 8 位数据帧。 8-bit data frame.
+    LL_SPI_DATA_FRAME_SIZE_9_BIT,      ///< 9 位数据帧。 9-bit data frame.
+    LL_SPI_DATA_FRAME_SIZE_10_BIT,     ///< 10 位数据帧。 10-bit data frame.
+    LL_SPI_DATA_FRAME_SIZE_11_BIT,     ///< 11 位数据帧。 11-bit data frame.
+    LL_SPI_DATA_FRAME_SIZE_12_BIT,     ///< 12 位数据帧。 12-bit data frame.
+    LL_SPI_DATA_FRAME_SIZE_13_BIT,     ///< 13 位数据帧。 13-bit data frame.
+    LL_SPI_DATA_FRAME_SIZE_14_BIT,     ///< 14 位数据帧。 14-bit data frame.
+    LL_SPI_DATA_FRAME_SIZE_15_BIT,     ///< 15 位数据帧。 15-bit data frame.
+    LL_SPI_DATA_FRAME_SIZE_16_BIT,     ///< 16 位数据帧。 16-bit data frame.
+} sg200x_ll_spi_data_frame_size_t;
 
 /**
  * @brief 由 CPOL 与 SCPH 组成的标准 SPI 模式 / Standard SPI mode formed by CPOL and SCPH.
  */
 typedef enum
 {
-    SGLL_SPI_MODE_0 = 0U, ///< 模式 0：CPOL=0、SCPH=0。 Mode 0: CPOL=0, SCPH=0.
-    SGLL_SPI_MODE_1 = 1U, ///< 模式 1：CPOL=0、SCPH=1；8 位全双工 CTRLR0=0x47。 Mode 1: CPOL=0, SCPH=1.
-    SGLL_SPI_MODE_2 = 2U, ///< 模式 2：CPOL=1、SCPH=0。 Mode 2: CPOL=1, SCPH=0.
-    SGLL_SPI_MODE_3 = 3U, ///< 模式 3：CPOL=1、SCPH=1。 Mode 3: CPOL=1, SCPH=1.
-} sgll_spi_mode_t;
+    LL_SPI_MODE_0 = 0U, ///< 模式 0：CPOL=0、SCPH=0。 Mode 0: CPOL=0, SCPH=0.
+    LL_SPI_MODE_1 = 1U, ///< 模式 1：CPOL=0、SCPH=1；8 位全双工 CTRLR0=0x47。 Mode 1: CPOL=0, SCPH=1.
+    LL_SPI_MODE_2 = 2U, ///< 模式 2：CPOL=1、SCPH=0。 Mode 2: CPOL=1, SCPH=0.
+    LL_SPI_MODE_3 = 3U, ///< 模式 3：CPOL=1、SCPH=1。 Mode 3: CPOL=1, SCPH=1.
+} sg200x_ll_spi_mode_t;
 
 /**
  * @brief 已禁止 SSI 主机的无状态初始化参数 / Stateless initialization parameters for a disabled SSI master.
  */
 typedef struct
 {
-    sgll_spi_mode_t mode; ///< 标准 SPI 模式 0 到 3。 Standard SPI mode zero through three.
-    sgll_spi_transfer_mode_t
+    sg200x_ll_spi_mode_t mode; ///< 标准 SPI 模式 0 到 3。 Standard SPI mode zero through three.
+    sg200x_ll_spi_transfer_mode_t
         transfer_mode; ///< 收发方向或 EEPROM 读取模式。 Transmit/receive direction or EEPROM-read mode.
-    sgll_spi_frame_format_t
+    sg200x_ll_spi_frame_format_t
         frame_format; ///< Motorola、TI SSP 或 NS Microwire 格式。 Motorola, TI SSP, or NS Microwire format.
-    sgll_spi_data_frame_size_t
+    sg200x_ll_spi_data_frame_size_t
         data_frame_size; ///< 4 到 16 位数据帧的 DFS 编码。 DFS encoding for four- to sixteen-bit data frames.
-    sgll_spi_control_frame_size_t control_frame_size; ///< 1 到 16 位控制帧的 CFS 编码。 CFS encoding for one-
-                                                      ///< to sixteen-bit control frames.
-    bool loopback; ///< 使能移位寄存器回环。 Enable shift-register loopback.
+    sg200x_ll_spi_control_frame_size_t
+        control_frame_size; ///< 1 到 16 位控制帧的 CFS 编码。 CFS encoding for one-
+                            ///< to sixteen-bit control frames.
+    bool loopback;          ///< 使能移位寄存器回环。 Enable shift-register loopback.
     uint32_t baud_divider; ///< 2 到 65534 的偶数分频值，Init 不接受 0。 Even divisor from 2 through 65534;
                            ///< Init rejects zero.
     uint32_t
@@ -163,7 +164,7 @@ typedef struct
                            ///< 0 through 7.
     uint32_t rx_sample_delay; ///< 接收采样延迟，范围为 0 到 7。 Receive-sample delay from 0 through 7.
     uint32_t microwire_control; ///< MWCR 中定义的低 3 位。 Defined low three bits of MWCR.
-} sgll_spi_init_t;
+} sg200x_ll_spi_init_t;
 
 #ifdef __cplusplus
 extern "C"
@@ -179,7 +180,7 @@ extern "C"
      *       Defaults are eight-bit Motorola mode zero, full duplex, divisor two, and zero thresholds; a null
      *       pointer is ignored.
      */
-    void sgll_spi_struct_init(sgll_spi_init_t *config);
+    void sg200x_ll_spi_struct_init(sg200x_ll_spi_init_t *config);
 
     /**
      * @brief 初始化调用者拥有的已禁止 SPI 实例 / Initialize a disabled SPI instance owned by the caller.
@@ -192,7 +193,7 @@ extern "C"
      *       Only SPI0-3 are supported; clocks must be enabled, reset released, and SPIENR zero. SSI, selects,
      *       interrupts, and DMA requests remain disabled on success.
      */
-    bool sgll_spi_init(spi_t *spi, const sgll_spi_init_t *config);
+    bool sg200x_ll_spi_init(spi_t *spi, const sg200x_ll_spi_init_t *config);
 
     /**
      * @brief 复位一个已禁止的 SPI 实例 / Reset one disabled SPI instance.
@@ -203,7 +204,7 @@ extern "C"
      * @note 调用者先禁止 SSI 并停止相关 DMA；只脉冲当前实例的复位位。
      *       Disable SSI and stop associated DMA first; only this instance's reset bit is pulsed.
      */
-    bool sgll_spi_deinit(spi_t *spi);
+    bool sg200x_ll_spi_deinit(spi_t *spi);
 #ifdef __cplusplus
 }
 #endif
@@ -222,11 +223,11 @@ extern "C"
  * @param data_frame_size 数据帧位数减 1 的 DFS 编码 / DFS encoding equal to data-frame bits minus one.
  * @return CTRLR0 编码，不访问寄存器 / CTRLR0 encoding without register access.
  */
-static inline uint32_t sgll_spi_ctrlr0_build(
-    sgll_spi_control_frame_size_t control_frame_size, bool shift_register_loop,
-    sgll_spi_transfer_mode_t transfer_mode, sgll_spi_clock_polarity_t clock_polarity,
-    sgll_spi_clock_phase_t clock_phase, sgll_spi_frame_format_t frame_format,
-    sgll_spi_data_frame_size_t data_frame_size
+static inline uint32_t sg200x_ll_spi_ctrlr0_build(
+    sg200x_ll_spi_control_frame_size_t control_frame_size, bool shift_register_loop,
+    sg200x_ll_spi_transfer_mode_t transfer_mode, sg200x_ll_spi_clock_polarity_t clock_polarity,
+    sg200x_ll_spi_clock_phase_t clock_phase, sg200x_ll_spi_frame_format_t frame_format,
+    sg200x_ll_spi_data_frame_size_t data_frame_size
 )
 {
     uint32_t value = ((uint32_t)control_frame_size << SPI_CTRLR0_CFS_SHIFT) & SPI_CTRLR0_CFS_MASK;
@@ -237,11 +238,11 @@ static inline uint32_t sgll_spi_ctrlr0_build(
     {
         value |= SPI_CTRLR0_SRL_BIT;
     }
-    if (clock_polarity == SGLL_SPI_CLOCK_POLARITY_HIGH)
+    if (clock_polarity == LL_SPI_CLOCK_POLARITY_HIGH)
     {
         value |= SPI_CTRLR0_SCPOL_BIT;
     }
-    if (clock_phase == SGLL_SPI_CLOCK_PHASE_SECOND_EDGE)
+    if (clock_phase == LL_SPI_CLOCK_PHASE_SECOND_EDGE)
     {
         value |= SPI_CTRLR0_SCPH_BIT;
     }
@@ -256,15 +257,16 @@ static inline uint32_t sgll_spi_ctrlr0_build(
  * @return 包含极性、相位和回环选择的 CTRLR0 编码。
  *         CTRLR0 encoding with polarity, phase, and loopback selection.
  */
-static inline uint32_t sgll_spi_ctrlr0_build_motorola_8bit(sgll_spi_mode_t mode, bool shift_register_loop)
+static inline uint32_t
+sg200x_ll_spi_ctrlr0_build_motorola_8bit(sg200x_ll_spi_mode_t mode, bool shift_register_loop)
 {
-    const sgll_spi_clock_polarity_t polarity =
-        (mode & 2U) != 0U ? SGLL_SPI_CLOCK_POLARITY_HIGH : SGLL_SPI_CLOCK_POLARITY_LOW;
-    const sgll_spi_clock_phase_t phase =
-        (mode & 1U) != 0U ? SGLL_SPI_CLOCK_PHASE_SECOND_EDGE : SGLL_SPI_CLOCK_PHASE_FIRST_EDGE;
-    return sgll_spi_ctrlr0_build(
-        SGLL_SPI_CONTROL_FRAME_SIZE_1_BIT, shift_register_loop, SGLL_SPI_TRANSFER_MODE_TX_RX, polarity, phase,
-        SGLL_SPI_FRAME_FORMAT_MOTOROLA, SGLL_SPI_DATA_FRAME_SIZE_8_BIT
+    const sg200x_ll_spi_clock_polarity_t polarity =
+        (mode & 2U) != 0U ? LL_SPI_CLOCK_POLARITY_HIGH : LL_SPI_CLOCK_POLARITY_LOW;
+    const sg200x_ll_spi_clock_phase_t phase =
+        (mode & 1U) != 0U ? LL_SPI_CLOCK_PHASE_SECOND_EDGE : LL_SPI_CLOCK_PHASE_FIRST_EDGE;
+    return sg200x_ll_spi_ctrlr0_build(
+        LL_SPI_CONTROL_FRAME_SIZE_1_BIT, shift_register_loop, LL_SPI_TRANSFER_MODE_TX_RX, polarity, phase,
+        LL_SPI_FRAME_FORMAT_MOTOROLA, LL_SPI_DATA_FRAME_SIZE_8_BIT
     );
 }
 
@@ -274,10 +276,10 @@ static inline uint32_t sgll_spi_ctrlr0_build_motorola_8bit(sgll_spi_mode_t mode,
  * @param ctrlr0 待解析的 CTRLR0 数值 / CTRLR0 value to decode.
  * @return 由 CPOL 和 SCPH 决定的模式 0 到 3 / Mode zero through three selected by CPOL and SCPH.
  */
-static inline sgll_spi_mode_t sgll_spi_mode_get(uint32_t ctrlr0)
+static inline sg200x_ll_spi_mode_t sg200x_ll_spi_mode_get(uint32_t ctrlr0)
 {
-    return (sgll_spi_mode_t)(((ctrlr0 & SPI_CTRLR0_SCPOL_BIT) != 0U ? 2U : 0U) |
-                             ((ctrlr0 & SPI_CTRLR0_SCPH_BIT) != 0U ? 1U : 0U));
+    return (sg200x_ll_spi_mode_t)(((ctrlr0 & SPI_CTRLR0_SCPOL_BIT) != 0U ? 2U : 0U) |
+                                  ((ctrlr0 & SPI_CTRLR0_SCPH_BIT) != 0U ? 1U : 0U));
 }
 
 /**
@@ -287,7 +289,7 @@ static inline sgll_spi_mode_t sgll_spi_mode_get(uint32_t ctrlr0)
  * @param value 要写入或编码的数值 / Value to write or encode.
  * @pre SSI 必须处于禁止状态 / SSI must be disabled.
  */
-static inline void sgll_spi_ctrlr0_set(spi_t *spi, uint32_t value) { spi->CTRLR0 = value & 0xFFFFUL; }
+static inline void sg200x_ll_spi_ctrlr0_set(spi_t *spi, uint32_t value) { spi->CTRLR0 = value & 0xFFFFUL; }
 
 /**
  * @brief 读取 CTRLR0 的低 16 位配置 / Read the low sixteen configuration bits of CTRLR0.
@@ -295,21 +297,21 @@ static inline void sgll_spi_ctrlr0_set(spi_t *spi, uint32_t value) { spi->CTRLR0
  * @param spi SPI 寄存器实例 / SPI register instance.
  * @return 屏蔽高位后的 CTRLR0 值 / CTRLR0 with upper bits masked off.
  */
-static inline uint32_t sgll_spi_ctrlr0_get(const spi_t *spi) { return spi->CTRLR0 & 0xFFFFUL; }
+static inline uint32_t sg200x_ll_spi_ctrlr0_get(const spi_t *spi) { return spi->CTRLR0 & 0xFFFFUL; }
 
 /**
  * @brief 使能 SSI 控制器 / Enable the SSI controller.
  *
  * @param spi SPI 寄存器实例 / SPI register instance.
  */
-static inline void sgll_spi_enable(spi_t *spi) { spi->SPIENR = SPI_SPIENR_ENABLE_BIT; }
+static inline void sg200x_ll_spi_enable(spi_t *spi) { spi->SPIENR = SPI_SPIENR_ENABLE_BIT; }
 
 /**
  * @brief 禁止 SSI 控制器 / Disable the SSI controller.
  *
  * @param spi SPI 寄存器实例 / SPI register instance.
  */
-static inline void sgll_spi_disable(spi_t *spi) { spi->SPIENR = 0U; }
+static inline void sg200x_ll_spi_disable(spi_t *spi) { spi->SPIENR = 0U; }
 
 /**
  * @brief 检查 SSI 控制器是否使能 / Check whether the SSI controller is enabled.
@@ -317,7 +319,7 @@ static inline void sgll_spi_disable(spi_t *spi) { spi->SPIENR = 0U; }
  * @param spi SPI 寄存器实例 / SPI register instance.
  * @return SPIENR 使能位置位时返回 true / True when the SPIENR enable bit is set.
  */
-static inline bool sgll_spi_is_enabled(const spi_t *spi)
+static inline bool sg200x_ll_spi_is_enabled(const spi_t *spi)
 {
     return (spi->SPIENR & SPI_SPIENR_ENABLE_BIT) != 0U;
 }
@@ -329,16 +331,19 @@ static inline bool sgll_spi_is_enabled(const spi_t *spi)
  * @param mask 片选位掩码；本芯片只写入已定义的 SER 位 0。
  *        Slave-select mask; only the defined SER bit zero is written on this chip.
  */
-static inline void sgll_spi_slave_select_set(spi_t *spi, uint32_t mask) { spi->SER = mask & SPI_SER_MASK; }
+static inline void sg200x_ll_spi_slave_select_set(spi_t *spi, uint32_t mask)
+{
+    spi->SER = mask & SPI_SER_MASK;
+}
 
 /**
  * @brief 使能 SPI 的片选 0 / Enable SPI slave select zero.
  *
  * @param spi SPI 寄存器实例 / SPI register instance.
  */
-static inline void sgll_spi_slave_select_enable(spi_t *spi)
+static inline void sg200x_ll_spi_slave_select_enable(spi_t *spi)
 {
-    sgll_spi_slave_select_set(spi, SPI_SER_CS0_BIT);
+    sg200x_ll_spi_slave_select_set(spi, SPI_SER_CS0_BIT);
 }
 
 /**
@@ -346,7 +351,7 @@ static inline void sgll_spi_slave_select_enable(spi_t *spi)
  *
  * @param spi SPI 寄存器实例 / SPI register instance.
  */
-static inline void sgll_spi_slave_select_disable(spi_t *spi) { spi->SER = 0U; }
+static inline void sg200x_ll_spi_slave_select_disable(spi_t *spi) { spi->SER = 0U; }
 
 /**
  * @brief 检查片选 0 的使能状态 / Check the enable state of slave select zero.
@@ -354,7 +359,10 @@ static inline void sgll_spi_slave_select_disable(spi_t *spi) { spi->SER = 0U; }
  * @param spi SPI 寄存器实例 / SPI register instance.
  * @return SER 的片选 0 位置位时返回 true / True when slave-select bit zero in SER is set.
  */
-static inline bool sgll_spi_slave_is_selected(const spi_t *spi) { return (spi->SER & SPI_SER_CS0_BIT) != 0U; }
+static inline bool sg200x_ll_spi_slave_is_selected(const spi_t *spi)
+{
+    return (spi->SER & SPI_SER_CS0_BIT) != 0U;
+}
 
 /**
  * @brief 设置接收模式的帧数量 / Set the receive-mode frame count.
@@ -366,7 +374,7 @@ static inline bool sgll_spi_slave_is_selected(const spi_t *spi) { return (spi->S
  * @note CTRLR1.NDF 存储 count - 1，用于只接收等接收计数模式。
  *       CTRLR1.NDF stores count minus one for receive-count modes such as receive-only.
  */
-static inline bool sgll_spi_data_frame_count_set(spi_t *spi, uint32_t count)
+static inline bool sg200x_ll_spi_data_frame_count_set(spi_t *spi, uint32_t count)
 {
 
     if (count == 0U || count > 65536UL)
@@ -383,7 +391,7 @@ static inline bool sgll_spi_data_frame_count_set(spi_t *spi, uint32_t count)
  * @param spi SPI 寄存器实例 / SPI register instance.
  * @return CTRLR1.NDF 加 1 后的帧数量 / Frame count obtained by adding one to CTRLR1.NDF.
  */
-static inline uint32_t sgll_spi_data_frame_count_get(const spi_t *spi)
+static inline uint32_t sg200x_ll_spi_data_frame_count_get(const spi_t *spi)
 {
     return (spi->CTRLR1 & SPI_CTRLR1_NDF_MASK) + 1U;
 }
@@ -396,7 +404,7 @@ static inline uint32_t sgll_spi_data_frame_count_get(const spi_t *spi)
  * @note 0 是关闭串行时钟的合法编码，不能作为有效传输分频；Init 不接受 0。
  *       Zero legally disables the serial clock but is not a transfer divisor; Init rejects zero.
  */
-static inline bool sgll_spi_baud_divider_is_valid(uint32_t divider)
+static inline bool sg200x_ll_spi_baud_divider_is_valid(uint32_t divider)
 {
     return divider == SPI_BAUDR_CLOCK_DISABLED ||
            (divider >= SPI_BAUDR_MIN && divider <= SPI_BAUDR_MAX && (divider & 1U) == 0U);
@@ -412,9 +420,9 @@ static inline bool sgll_spi_baud_divider_is_valid(uint32_t divider)
  * @note 0 是关闭串行时钟的合法编码，不能作为有效传输分频；Init 不接受 0。
  *       Zero legally disables the serial clock but is not a transfer divisor; Init rejects zero.
  */
-static inline bool sgll_spi_baud_divider_set(spi_t *spi, uint32_t divider)
+static inline bool sg200x_ll_spi_baud_divider_set(spi_t *spi, uint32_t divider)
 {
-    if (!sgll_spi_baud_divider_is_valid(divider))
+    if (!sg200x_ll_spi_baud_divider_is_valid(divider))
     {
         return false;
     }
@@ -428,7 +436,10 @@ static inline bool sgll_spi_baud_divider_set(spi_t *spi, uint32_t divider)
  * @param spi SPI 寄存器实例 / SPI register instance.
  * @return 原始分频值；0 表示串行时钟关闭 / Raw divisor; zero means the serial clock is disabled.
  */
-static inline uint32_t sgll_spi_baud_divider_get(const spi_t *spi) { return spi->BAUDR & SPI_BAUDR_MASK; }
+static inline uint32_t sg200x_ll_spi_baud_divider_get(const spi_t *spi)
+{
+    return spi->BAUDR & SPI_BAUDR_MASK;
+}
 
 /**
  * @brief 设置发送 FIFO 的原始中断阈值 / Set the raw transmit FIFO interrupt threshold.
@@ -437,7 +448,7 @@ static inline uint32_t sgll_spi_baud_divider_get(const spi_t *spi) { return spi-
  * @param level FIFO 阈值的原始寄存器编码 / Raw register encoding of the FIFO threshold.
  * @return 阈值在 0 到 7 之间时写入并返回 true / True after writing a threshold from 0 through 7.
  */
-static inline bool sgll_spi_tx_fifo_threshold_set(spi_t *spi, uint32_t level)
+static inline bool sg200x_ll_spi_tx_fifo_threshold_set(spi_t *spi, uint32_t level)
 {
     if (level > SPI_FIFO_THRESHOLD_MAX)
     {
@@ -456,7 +467,7 @@ static inline bool sgll_spi_tx_fifo_threshold_set(spi_t *spi, uint32_t level)
  * @note RXFTLR 只有 3 位；接收条目数达到 level + 1 时触发。
  *       RXFTLR is only three bits wide; it triggers when the receive count reaches level plus one.
  */
-static inline bool sgll_spi_rx_fifo_threshold_set(spi_t *spi, uint32_t level)
+static inline bool sg200x_ll_spi_rx_fifo_threshold_set(spi_t *spi, uint32_t level)
 {
 
     if (level > SPI_FIFO_THRESHOLD_MAX)
@@ -477,14 +488,14 @@ static inline bool sgll_spi_rx_fifo_threshold_set(spi_t *spi, uint32_t level)
  *         True for one through eight entries; otherwise no register is written.
  * @note 实际写入 RXFTLR 的值为 entries - 1 / The value written to RXFTLR is entries minus one.
  */
-static inline bool sgll_spi_rx_fifo_trigger_level_set(spi_t *spi, uint32_t entries)
+static inline bool sg200x_ll_spi_rx_fifo_trigger_level_set(spi_t *spi, uint32_t entries)
 {
 
     if (entries == 0U || entries > SPI_FIFO_DEPTH)
     {
         return false;
     }
-    return sgll_spi_rx_fifo_threshold_set(spi, entries - 1U);
+    return sg200x_ll_spi_rx_fifo_threshold_set(spi, entries - 1U);
 }
 
 /**
@@ -493,7 +504,7 @@ static inline bool sgll_spi_rx_fifo_trigger_level_set(spi_t *spi, uint32_t entri
  * @param spi SPI 寄存器实例 / SPI register instance.
  * @return 发送 FIFO 的当前条目数 / Current transmit FIFO entry count.
  */
-static inline uint32_t sgll_spi_tx_fifo_level_get(const spi_t *spi)
+static inline uint32_t sg200x_ll_spi_tx_fifo_level_get(const spi_t *spi)
 {
     return spi->TXFLR & SPI_FIFO_LEVEL_MASK;
 }
@@ -504,7 +515,7 @@ static inline uint32_t sgll_spi_tx_fifo_level_get(const spi_t *spi)
  * @param spi SPI 寄存器实例 / SPI register instance.
  * @return 接收 FIFO 的当前条目数 / Current receive FIFO entry count.
  */
-static inline uint32_t sgll_spi_rx_fifo_level_get(const spi_t *spi)
+static inline uint32_t sg200x_ll_spi_rx_fifo_level_get(const spi_t *spi)
 {
     return spi->RXFLR & SPI_FIFO_LEVEL_MASK;
 }
@@ -517,7 +528,7 @@ static inline uint32_t sgll_spi_rx_fifo_level_get(const spi_t *spi)
  * @note 读取 SR 会清除位 5、6 的错误状态，参见 TRM 表 21.85。
  *       Reading SR clears error status bits five and six; see TRM Table 21.85.
  */
-static inline uint32_t sgll_spi_status_get(const spi_t *spi) { return spi->SR; }
+static inline uint32_t sg200x_ll_spi_status_get(const spi_t *spi) { return spi->SR; }
 
 /**
  * @brief 检查 SSI 是否忙 / Check whether SSI is busy.
@@ -527,9 +538,9 @@ static inline uint32_t sgll_spi_status_get(const spi_t *spi) { return spi->SR; }
  * @note 读取 SR 会清除位 5、6 的错误状态，参见 TRM 表 21.85。
  *       Reading SR clears error status bits five and six; see TRM Table 21.85.
  */
-static inline bool sgll_spi_is_busy(const spi_t *spi)
+static inline bool sg200x_ll_spi_is_busy(const spi_t *spi)
 {
-    return (sgll_spi_status_get(spi) & SPI_SR_BUSY_BIT) != 0U;
+    return (sg200x_ll_spi_status_get(spi) & SPI_SR_BUSY_BIT) != 0U;
 }
 
 /**
@@ -540,9 +551,9 @@ static inline bool sgll_spi_is_busy(const spi_t *spi)
  * @note 读取 SR 会清除位 5、6 的错误状态，参见 TRM 表 21.85。
  *       Reading SR clears error status bits five and six; see TRM Table 21.85.
  */
-static inline bool sgll_spi_tx_fifo_not_full(const spi_t *spi)
+static inline bool sg200x_ll_spi_tx_fifo_not_full(const spi_t *spi)
 {
-    return (sgll_spi_status_get(spi) & SPI_SR_TFNF_BIT) != 0U;
+    return (sg200x_ll_spi_status_get(spi) & SPI_SR_TFNF_BIT) != 0U;
 }
 
 /**
@@ -553,9 +564,9 @@ static inline bool sgll_spi_tx_fifo_not_full(const spi_t *spi)
  * @note 读取 SR 会清除位 5、6 的错误状态，参见 TRM 表 21.85。
  *       Reading SR clears error status bits five and six; see TRM Table 21.85.
  */
-static inline bool sgll_spi_rx_fifo_not_empty(const spi_t *spi)
+static inline bool sg200x_ll_spi_rx_fifo_not_empty(const spi_t *spi)
 {
-    return (sgll_spi_status_get(spi) & SPI_SR_RFNE_BIT) != 0U;
+    return (sg200x_ll_spi_status_get(spi) & SPI_SR_RFNE_BIT) != 0U;
 }
 
 /**
@@ -564,7 +575,10 @@ static inline bool sgll_spi_rx_fifo_not_empty(const spi_t *spi)
  * @param spi SPI 寄存器实例 / SPI register instance.
  * @return IMR 中定义的低 6 位 / Defined low six bits of IMR.
  */
-static inline uint32_t sgll_spi_interrupt_mask_get(const spi_t *spi) { return spi->IMR & SPI_INTERRUPT_MASK; }
+static inline uint32_t sg200x_ll_spi_interrupt_mask_get(const spi_t *spi)
+{
+    return spi->IMR & SPI_INTERRUPT_MASK;
+}
 
 /**
  * @brief 设置 SPI 中断使能掩码 / Set the SPI interrupt-enable mask.
@@ -572,7 +586,7 @@ static inline uint32_t sgll_spi_interrupt_mask_get(const spi_t *spi) { return sp
  * @param spi SPI 寄存器实例 / SPI register instance.
  * @param mask IMR 使能位掩码，只写入低 6 位 / IMR enable mask; only the low six bits are written.
  */
-static inline void sgll_spi_interrupt_mask_set(spi_t *spi, uint32_t mask)
+static inline void sg200x_ll_spi_interrupt_mask_set(spi_t *spi, uint32_t mask)
 {
     spi->IMR = mask & SPI_INTERRUPT_MASK;
 }
@@ -583,7 +597,7 @@ static inline void sgll_spi_interrupt_mask_set(spi_t *spi, uint32_t mask)
  * @param spi SPI 寄存器实例 / SPI register instance.
  * @return ISR 中定义的中断状态位 / Defined interrupt-status bits in ISR.
  */
-static inline uint32_t sgll_spi_interrupt_status_get(const spi_t *spi)
+static inline uint32_t sg200x_ll_spi_interrupt_status_get(const spi_t *spi)
 {
     return spi->ISR & SPI_INTERRUPT_MASK;
 }
@@ -594,7 +608,7 @@ static inline uint32_t sgll_spi_interrupt_status_get(const spi_t *spi)
  * @param spi SPI 寄存器实例 / SPI register instance.
  * @return RISR 中定义的中断状态位 / Defined interrupt-status bits in RISR.
  */
-static inline uint32_t sgll_spi_raw_interrupt_status_get(const spi_t *spi)
+static inline uint32_t sg200x_ll_spi_raw_interrupt_status_get(const spi_t *spi)
 {
     return spi->RISR & SPI_INTERRUPT_MASK;
 }
@@ -606,7 +620,7 @@ static inline uint32_t sgll_spi_raw_interrupt_status_get(const spi_t *spi)
  * @return 清除寄存器读回值 / Value read from the clear register.
  * @note 该读取具有清除状态的副作用 / This read has the side effect of clearing status.
  */
-static inline uint32_t sgll_spi_interrupt_clear(spi_t *spi) { return spi->ICR; }
+static inline uint32_t sg200x_ll_spi_interrupt_clear(spi_t *spi) { return spi->ICR; }
 
 /**
  * @brief 通过读 TXOICR 清除发送溢出中断 / Clear transmit-overflow interrupt by reading TXOICR.
@@ -615,7 +629,7 @@ static inline uint32_t sgll_spi_interrupt_clear(spi_t *spi) { return spi->ICR; }
  * @return 清除寄存器读回值 / Value read from the clear register.
  * @note 该读取具有清除状态的副作用 / This read has the side effect of clearing status.
  */
-static inline uint32_t sgll_spi_tx_overflow_clear(spi_t *spi) { return spi->TXOICR; }
+static inline uint32_t sg200x_ll_spi_tx_overflow_clear(spi_t *spi) { return spi->TXOICR; }
 
 /**
  * @brief 通过读 RXOICR 清除接收溢出中断 / Clear receive-overflow interrupt by reading RXOICR.
@@ -624,7 +638,7 @@ static inline uint32_t sgll_spi_tx_overflow_clear(spi_t *spi) { return spi->TXOI
  * @return 清除寄存器读回值 / Value read from the clear register.
  * @note 该读取具有清除状态的副作用 / This read has the side effect of clearing status.
  */
-static inline uint32_t sgll_spi_rx_overflow_clear(spi_t *spi) { return spi->RXOICR; }
+static inline uint32_t sg200x_ll_spi_rx_overflow_clear(spi_t *spi) { return spi->RXOICR; }
 
 /**
  * @brief 通过读 RXUICR 清除接收下溢中断 / Clear receive-underflow interrupt by reading RXUICR.
@@ -633,7 +647,7 @@ static inline uint32_t sgll_spi_rx_overflow_clear(spi_t *spi) { return spi->RXOI
  * @return 清除寄存器读回值 / Value read from the clear register.
  * @note 该读取具有清除状态的副作用 / This read has the side effect of clearing status.
  */
-static inline uint32_t sgll_spi_rx_underflow_clear(spi_t *spi) { return spi->RXUICR; }
+static inline uint32_t sg200x_ll_spi_rx_underflow_clear(spi_t *spi) { return spi->RXUICR; }
 
 /**
  * @brief 通过读 MSTICR 清除多主机竞争中断 / Clear multi-master contention interrupt by reading MSTICR.
@@ -642,7 +656,7 @@ static inline uint32_t sgll_spi_rx_underflow_clear(spi_t *spi) { return spi->RXU
  * @return 清除寄存器读回值 / Value read from the clear register.
  * @note 该读取具有清除状态的副作用 / This read has the side effect of clearing status.
  */
-static inline uint32_t sgll_spi_multi_master_clear(spi_t *spi) { return spi->MSTICR; }
+static inline uint32_t sg200x_ll_spi_multi_master_clear(spi_t *spi) { return spi->MSTICR; }
 
 /**
  * @brief 设置 SPI 收发 DMA 请求使能位 / Set SPI receive/transmit DMA request enables.
@@ -653,7 +667,10 @@ static inline uint32_t sgll_spi_multi_master_clear(spi_t *spi) { return spi->MST
  * @note 只配置 SSI 请求位，DMA 通道及描述符由调用者管理。
  *       Only SSI request bits are configured; the caller manages DMA channels and descriptors.
  */
-static inline void sgll_spi_dma_control_set(spi_t *spi, uint32_t mask) { spi->DMACR = mask & SPI_DMACR_MASK; }
+static inline void sg200x_ll_spi_dma_control_set(spi_t *spi, uint32_t mask)
+{
+    spi->DMACR = mask & SPI_DMACR_MASK;
+}
 
 /**
  * @brief 关闭 SPI 的全部 DMA 请求 / Disable all SPI DMA requests.
@@ -662,7 +679,7 @@ static inline void sgll_spi_dma_control_set(spi_t *spi, uint32_t mask) { spi->DM
  * @note 只配置 SSI 请求位，DMA 通道及描述符由调用者管理。
  *       Only SSI request bits are configured; the caller manages DMA channels and descriptors.
  */
-static inline void sgll_spi_dma_disable(spi_t *spi) { sgll_spi_dma_control_set(spi, 0U); }
+static inline void sg200x_ll_spi_dma_disable(spi_t *spi) { sg200x_ll_spi_dma_control_set(spi, 0U); }
 
 /**
  * @brief 分别配置 SPI 接收和发送 DMA 请求 / Configure SPI receive and transmit DMA requests separately.
@@ -673,7 +690,7 @@ static inline void sgll_spi_dma_disable(spi_t *spi) { sgll_spi_dma_control_set(s
  * @note 只配置 SSI 请求位，DMA 通道及描述符由调用者管理。
  *       Only SSI request bits are configured; the caller manages DMA channels and descriptors.
  */
-static inline void sgll_spi_dma_enable(spi_t *spi, bool receive, bool transmit)
+static inline void sg200x_ll_spi_dma_enable(spi_t *spi, bool receive, bool transmit)
 {
     uint32_t mask = 0U;
     if (receive)
@@ -684,7 +701,7 @@ static inline void sgll_spi_dma_enable(spi_t *spi, bool receive, bool transmit)
     {
         mask |= SPI_DMACR_TX_ENABLE_BIT;
     }
-    sgll_spi_dma_control_set(spi, mask);
+    sg200x_ll_spi_dma_control_set(spi, mask);
 }
 
 /**
@@ -696,7 +713,7 @@ static inline void sgll_spi_dma_enable(spi_t *spi, bool receive, bool transmit)
  * @note 发送 FIFO 条目数不大于 level 时提出 DMA 请求。
  *       A DMA request is raised when the transmit FIFO count is no greater than level.
  */
-static inline bool sgll_spi_dma_tx_level_set(spi_t *spi, uint32_t level)
+static inline bool sg200x_ll_spi_dma_tx_level_set(spi_t *spi, uint32_t level)
 {
     if (level >= SPI_FIFO_DEPTH)
     {
@@ -715,7 +732,7 @@ static inline bool sgll_spi_dma_tx_level_set(spi_t *spi, uint32_t level)
  * @note 接收 FIFO 条目数达到 level + 1 时提出 DMA 请求。
  *       A DMA request is raised when the receive FIFO count reaches level plus one.
  */
-static inline bool sgll_spi_dma_rx_level_set(spi_t *spi, uint32_t level)
+static inline bool sg200x_ll_spi_dma_rx_level_set(spi_t *spi, uint32_t level)
 {
     if (level >= SPI_FIFO_DEPTH)
     {
@@ -734,7 +751,7 @@ static inline bool sgll_spi_dma_rx_level_set(spi_t *spi, uint32_t level)
  * @note DR 有 36 个地址别名供总线突发访问同一 FIFO；本接口使用 DR[0]。
  *       DR has 36 aliases for burst access to the same FIFO; this interface uses DR[0].
  */
-static inline void sgll_spi_data_write(spi_t *spi, uint16_t value)
+static inline void sg200x_ll_spi_data_write(spi_t *spi, uint16_t value)
 {
 
     spi->DR[0] = (uint32_t)value & SPI_DR_MASK;
@@ -747,7 +764,7 @@ static inline void sgll_spi_data_write(spi_t *spi, uint16_t value)
  * @return 接收数据端口的低 16 位 / Low sixteen bits read from the receive data port.
  * @pre 接收 FIFO 必须非空 / The receive FIFO must be nonempty.
  */
-static inline uint16_t sgll_spi_data_read(spi_t *spi) { return (uint16_t)(spi->DR[0] & SPI_DR_MASK); }
+static inline uint16_t sg200x_ll_spi_data_read(spi_t *spi) { return (uint16_t)(spi->DR[0] & SPI_DR_MASK); }
 
 /**
  * @brief 设置 SPI 接收采样延迟 / Set the SPI receive-sample delay.
@@ -759,7 +776,7 @@ static inline uint16_t sgll_spi_data_read(spi_t *spi) { return (uint16_t)(spi->D
  * @note 超出内部延迟深度的硬件编码会选择零延迟，本接口拒绝这些值。
  *       Hardware encodings beyond the internal delay depth select zero delay; this interface rejects them.
  */
-static inline bool sgll_spi_rx_sample_delay_set(spi_t *spi, uint32_t delay)
+static inline bool sg200x_ll_spi_rx_sample_delay_set(spi_t *spi, uint32_t delay)
 {
     if (delay > SPI_RX_SAMPLE_DLY_MAX)
     {
@@ -776,7 +793,7 @@ static inline bool sgll_spi_rx_sample_delay_set(spi_t *spi, uint32_t delay)
  * @param spi SPI 寄存器实例 / SPI register instance.
  * @return RX_SAMPLE_DLY 的低 8 位 / Low eight bits of RX_SAMPLE_DLY.
  */
-static inline uint32_t sgll_spi_rx_sample_delay_get(const spi_t *spi)
+static inline uint32_t sg200x_ll_spi_rx_sample_delay_get(const spi_t *spi)
 {
     return spi->RX_SAMPLE_DLY & SPI_RX_SAMPLE_DLY_MASK;
 }
@@ -787,7 +804,7 @@ static inline uint32_t sgll_spi_rx_sample_delay_get(const spi_t *spi)
  * @param spi SPI 寄存器实例 / SPI register instance.
  * @param value 要写入或编码的数值 / Value to write or encode.
  */
-static inline void sgll_spi_microwire_control_set(spi_t *spi, uint32_t value)
+static inline void sg200x_ll_spi_microwire_control_set(spi_t *spi, uint32_t value)
 {
     spi->MWCR = value & SPI_MWCR_MASK;
 }
@@ -798,7 +815,10 @@ static inline void sgll_spi_microwire_control_set(spi_t *spi, uint32_t value)
  * @param spi SPI 寄存器实例 / SPI register instance.
  * @return MWCR 中定义的低 3 位 / Defined low three bits of MWCR.
  */
-static inline uint32_t sgll_spi_microwire_control_get(const spi_t *spi) { return spi->MWCR & SPI_MWCR_MASK; }
+static inline uint32_t sg200x_ll_spi_microwire_control_get(const spi_t *spi)
+{
+    return spi->MWCR & SPI_MWCR_MASK;
+}
 
 #ifdef __cplusplus
 extern "C"
@@ -812,7 +832,7 @@ extern "C"
      * @return 观察到空闲时为 true；空实例或超时为 false。
      *        True when idle is observed; false for a null instance or timeout.
      */
-    bool sgll_spi_wait_idle(const SPI_Type *spi, uint32_t attempts);
+    bool sg200x_ll_spi_wait_idle(const SPI_Type *spi, uint32_t attempts);
 
 #ifdef __cplusplus
 }

@@ -11,7 +11,7 @@ static bool adc_instance_valid(const SARADC_Type *adc)
     return adc == SARADC_REGS || adc == RTC_SARADC_REGS;
 }
 
-void sgll_adc_struct_init(sgll_adc_init_t *config)
+void sg200x_ll_adc_struct_init(sg200x_ll_adc_init_t *config)
 {
     if (config != NULL)
     {
@@ -20,10 +20,10 @@ void sgll_adc_struct_init(sgll_adc_init_t *config)
     }
 }
 
-bool sgll_adc_init(SARADC_Type *adc, const sgll_adc_init_t *config)
+bool sg200x_ll_adc_init(SARADC_Type *adc, const sg200x_ll_adc_init_t *config)
 {
     if (!adc_instance_valid(adc) || config == NULL || config->clock_divider > SARADC_CYCLE_DIVIDER_MAX ||
-        sgll_adc_is_busy(adc))
+        sg200x_ll_adc_is_busy(adc))
         return false;
     uint32_t cycles = adc->CYC_SET;
     cycles &=
@@ -37,31 +37,32 @@ bool sgll_adc_init(SARADC_Type *adc, const sgll_adc_init_t *config)
     adc->INTR_CLR = SARADC_INTERRUPT_BIT;
     adc->TEST = (adc->TEST & ~SARADC_TEST_EXTERNAL_REFERENCE_BIT) |
                 (config->external_reference ? SARADC_TEST_EXTERNAL_REFERENCE_BIT : 0U);
-    sgll_csr_fence_io();
+    sg200x_ll_csr_fence_io();
     return true;
 }
 
-bool sgll_adc_start(SARADC_Type *adc, uint32_t channel)
+bool sg200x_ll_adc_start(SARADC_Type *adc, uint32_t channel)
 {
-    if (!adc_instance_valid(adc) || channel == 0U || channel > SARADC_CHANNEL_COUNT || sgll_adc_is_busy(adc))
+    if (!adc_instance_valid(adc) || channel == 0U || channel > SARADC_CHANNEL_COUNT ||
+        sg200x_ll_adc_is_busy(adc))
         return false;
     const uint32_t control = (adc->CTRL & ~(SARADC_CTRL_CHANNEL_MASK | SARADC_CTRL_TRIGGER_BIT)) |
                              (1U << (SARADC_CTRL_CHANNEL_SHIFT + channel));
     adc->CTRL = control;
     adc->INTR_CLR = SARADC_INTERRUPT_BIT;
-    sgll_csr_fence_io();
+    sg200x_ll_csr_fence_io();
     adc->CTRL = control | SARADC_CTRL_TRIGGER_BIT;
-    sgll_csr_fence_io();
+    sg200x_ll_csr_fence_io();
     return true;
 }
 
-bool sgll_adc_wait_idle(const SARADC_Type *adc, uint32_t attempts)
+bool sg200x_ll_adc_wait_idle(const SARADC_Type *adc, uint32_t attempts)
 {
     if (!adc_instance_valid(adc))
         return false;
     for (uint32_t attempt = 0U; attempt < attempts; ++attempt)
     {
-        if (!sgll_adc_is_busy(adc))
+        if (!sg200x_ll_adc_is_busy(adc))
             return true;
     }
     return false;

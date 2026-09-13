@@ -48,23 +48,23 @@ static constexpr auto SARADC_CHANNEL_COUNT = 3U;
 static constexpr auto DMA_CHANNEL_COUNT = 8U;
 
 /// @brief Machine-mode global interrupt-enable bit.
-static constexpr auto SGLL_MSTATUS_MIE_BIT = (1UL << 3);
+static constexpr auto LL_MSTATUS_MIE_BIT = (1UL << 3);
 
 /// @brief Supervisor software interrupt-enable bit.
-static constexpr auto SGLL_MIE_SSIE_BIT = (1UL << 1);
+static constexpr auto LL_MIE_SSIE_BIT = (1UL << 1);
 /// @brief Machine software interrupt-enable bit.
-static constexpr auto SGLL_MIE_MSIE_BIT = (1UL << 3);
+static constexpr auto LL_MIE_MSIE_BIT = (1UL << 3);
 /// @brief Supervisor timer interrupt-enable bit.
-static constexpr auto SGLL_MIE_STIE_BIT = (1UL << 5);
+static constexpr auto LL_MIE_STIE_BIT = (1UL << 5);
 /// @brief Machine timer interrupt-enable bit.
-static constexpr auto SGLL_MIE_MTIE_BIT = (1UL << 7);
+static constexpr auto LL_MIE_MTIE_BIT = (1UL << 7);
 /// @brief Supervisor external interrupt-enable bit.
-static constexpr auto SGLL_MIE_SEIE_BIT = (1UL << 9);
+static constexpr auto LL_MIE_SEIE_BIT = (1UL << 9);
 /// @brief Machine external interrupt-enable bit used by the PLIC.
-static constexpr auto SGLL_MIE_MEIE_BIT = (1UL << 11);
+static constexpr auto LL_MIE_MEIE_BIT = (1UL << 11);
 
 /// @brief C906L data-cache line size in bytes.
-static constexpr auto SGLL_DCACHE_LINE_SIZE = 64U;
+static constexpr auto LL_DCACHE_LINE_SIZE = 64U;
 
 /// @brief Base address of APB_MAILBOX registers.
 static constexpr auto APB_MAILBOX_BASE = 0x0190'0000UL;

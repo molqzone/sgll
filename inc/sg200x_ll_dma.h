@@ -12,74 +12,74 @@
  */
 typedef enum
 {
-    SGLL_DMA_WIDTH_BYTE = 0U,      ///< 8 位数据元素。 Eight-bit data items.
-    SGLL_DMA_WIDTH_HALF_WORD = 1U, ///< 16 位数据元素。 Sixteen-bit data items.
-} sgll_dma_width_t;
+    LL_DMA_WIDTH_BYTE = 0U,      ///< 8 位数据元素。 Eight-bit data items.
+    LL_DMA_WIDTH_HALF_WORD = 1U, ///< 16 位数据元素。 Sixteen-bit data items.
+} sg200x_ll_dma_width_t;
 
 /**
  * @brief DMA 数据传输方向 / DMA data-transfer direction.
  */
 typedef enum
 {
-    SGLL_DMA_MEMORY_TO_MEMORY = 0U,     ///< 内存到内存传输。 Memory-to-memory transfer.
-    SGLL_DMA_MEMORY_TO_PERIPHERAL = 1U, ///< 内存到外设传输。 Memory-to-peripheral transfer.
-    SGLL_DMA_PERIPHERAL_TO_MEMORY = 2U, ///< 外设到内存传输。 Peripheral-to-memory transfer.
-} sgll_dma_direction_t;
+    LL_DMA_MEMORY_TO_MEMORY = 0U,     ///< 内存到内存传输。 Memory-to-memory transfer.
+    LL_DMA_MEMORY_TO_PERIPHERAL = 1U, ///< 内存到外设传输。 Memory-to-peripheral transfer.
+    LL_DMA_PERIPHERAL_TO_MEMORY = 2U, ///< 外设到内存传输。 Peripheral-to-memory transfer.
+} sg200x_ll_dma_direction_t;
 
 /**
  * @brief DMA 普通或循环工作模式 / DMA normal or circular operating mode.
  */
 typedef enum
 {
-    SGLL_DMA_MODE_NORMAL = 0U,   ///< 单次描述符传输。 One-shot descriptor transfer.
-    SGLL_DMA_MODE_CIRCULAR = 1U, ///< 循环链表传输。 Circular linked-list transfer.
-} sgll_dma_mode_t;
+    LL_DMA_MODE_NORMAL = 0U,   ///< 单次描述符传输。 One-shot descriptor transfer.
+    LL_DMA_MODE_CIRCULAR = 1U, ///< 循环链表传输。 Circular linked-list transfer.
+} sg200x_ll_dma_mode_t;
 
 /**
  * @brief DMA 外设请求映射编号 / DMA peripheral-request mapping IDs.
  */
 typedef enum
 {
-    SGLL_DMA_REQUEST_NONE = DMA_REQUEST_NONE, ///< 不使用外设请求。 No peripheral request.
-    SGLL_DMA_REQUEST_UART0_RX =
+    LL_DMA_REQUEST_NONE = DMA_REQUEST_NONE, ///< 不使用外设请求。 No peripheral request.
+    LL_DMA_REQUEST_UART0_RX =
         DMA_REQUEST_UART0_RX, ///< UART0 的 DMA 接收请求。 DMA receive request for UART0.
-    SGLL_DMA_REQUEST_UART0_TX =
+    LL_DMA_REQUEST_UART0_TX =
         DMA_REQUEST_UART0_TX, ///< UART0 的 DMA 发送请求。 DMA transmit request for UART0.
-    SGLL_DMA_REQUEST_UART1_RX =
+    LL_DMA_REQUEST_UART1_RX =
         DMA_REQUEST_UART1_RX, ///< UART1 的 DMA 接收请求。 DMA receive request for UART1.
-    SGLL_DMA_REQUEST_UART1_TX =
+    LL_DMA_REQUEST_UART1_TX =
         DMA_REQUEST_UART1_TX, ///< UART1 的 DMA 发送请求。 DMA transmit request for UART1.
-    SGLL_DMA_REQUEST_UART2_RX =
+    LL_DMA_REQUEST_UART2_RX =
         DMA_REQUEST_UART2_RX, ///< UART2 的 DMA 接收请求。 DMA receive request for UART2.
-    SGLL_DMA_REQUEST_UART2_TX =
+    LL_DMA_REQUEST_UART2_TX =
         DMA_REQUEST_UART2_TX, ///< UART2 的 DMA 发送请求。 DMA transmit request for UART2.
-    SGLL_DMA_REQUEST_UART3_RX =
+    LL_DMA_REQUEST_UART3_RX =
         DMA_REQUEST_UART3_RX, ///< UART3 的 DMA 接收请求。 DMA receive request for UART3.
-    SGLL_DMA_REQUEST_UART3_TX =
+    LL_DMA_REQUEST_UART3_TX =
         DMA_REQUEST_UART3_TX, ///< UART3 的 DMA 发送请求。 DMA transmit request for UART3.
-    SGLL_DMA_REQUEST_UART4_RX =
+    LL_DMA_REQUEST_UART4_RX =
         DMA_REQUEST_UART4_RX, ///< UART4 的 DMA 接收请求。 DMA receive request for UART4.
-    SGLL_DMA_REQUEST_UART4_TX =
+    LL_DMA_REQUEST_UART4_TX =
         DMA_REQUEST_UART4_TX, ///< UART4 的 DMA 发送请求。 DMA transmit request for UART4.
-    SGLL_DMA_REQUEST_SPI0_RX = DMA_REQUEST_SPI0_RX, ///< SPI0 的 DMA 接收请求。 DMA receive request for SPI0.
-    SGLL_DMA_REQUEST_SPI0_TX = DMA_REQUEST_SPI0_TX, ///< SPI0 的 DMA 发送请求。 DMA transmit request for SPI0.
-    SGLL_DMA_REQUEST_SPI1_RX = DMA_REQUEST_SPI1_RX, ///< SPI1 的 DMA 接收请求。 DMA receive request for SPI1.
-    SGLL_DMA_REQUEST_SPI1_TX = DMA_REQUEST_SPI1_TX, ///< SPI1 的 DMA 发送请求。 DMA transmit request for SPI1.
-    SGLL_DMA_REQUEST_SPI2_RX = DMA_REQUEST_SPI2_RX, ///< SPI2 的 DMA 接收请求。 DMA receive request for SPI2.
-    SGLL_DMA_REQUEST_SPI2_TX = DMA_REQUEST_SPI2_TX, ///< SPI2 的 DMA 发送请求。 DMA transmit request for SPI2.
-    SGLL_DMA_REQUEST_SPI3_RX = DMA_REQUEST_SPI3_RX, ///< SPI3 的 DMA 接收请求。 DMA receive request for SPI3.
-    SGLL_DMA_REQUEST_SPI3_TX = DMA_REQUEST_SPI3_TX, ///< SPI3 的 DMA 发送请求。 DMA transmit request for SPI3.
-    SGLL_DMA_REQUEST_I2C0_RX = DMA_REQUEST_I2C0_RX, ///< I2C0 的 DMA 接收请求。 DMA receive request for I2C0.
-    SGLL_DMA_REQUEST_I2C0_TX = DMA_REQUEST_I2C0_TX, ///< I2C0 的 DMA 发送请求。 DMA transmit request for I2C0.
-    SGLL_DMA_REQUEST_I2C1_RX = DMA_REQUEST_I2C1_RX, ///< I2C1 的 DMA 接收请求。 DMA receive request for I2C1.
-    SGLL_DMA_REQUEST_I2C1_TX = DMA_REQUEST_I2C1_TX, ///< I2C1 的 DMA 发送请求。 DMA transmit request for I2C1.
-    SGLL_DMA_REQUEST_I2C2_RX = DMA_REQUEST_I2C2_RX, ///< I2C2 的 DMA 接收请求。 DMA receive request for I2C2.
-    SGLL_DMA_REQUEST_I2C2_TX = DMA_REQUEST_I2C2_TX, ///< I2C2 的 DMA 发送请求。 DMA transmit request for I2C2.
-    SGLL_DMA_REQUEST_I2C3_RX = DMA_REQUEST_I2C3_RX, ///< I2C3 的 DMA 接收请求。 DMA receive request for I2C3.
-    SGLL_DMA_REQUEST_I2C3_TX = DMA_REQUEST_I2C3_TX, ///< I2C3 的 DMA 发送请求。 DMA transmit request for I2C3.
-    SGLL_DMA_REQUEST_I2C4_RX = DMA_REQUEST_I2C4_RX, ///< I2C4 的 DMA 接收请求。 DMA receive request for I2C4.
-    SGLL_DMA_REQUEST_I2C4_TX = DMA_REQUEST_I2C4_TX, ///< I2C4 的 DMA 发送请求。 DMA transmit request for I2C4.
-} sgll_dma_request_t;
+    LL_DMA_REQUEST_SPI0_RX = DMA_REQUEST_SPI0_RX, ///< SPI0 的 DMA 接收请求。 DMA receive request for SPI0.
+    LL_DMA_REQUEST_SPI0_TX = DMA_REQUEST_SPI0_TX, ///< SPI0 的 DMA 发送请求。 DMA transmit request for SPI0.
+    LL_DMA_REQUEST_SPI1_RX = DMA_REQUEST_SPI1_RX, ///< SPI1 的 DMA 接收请求。 DMA receive request for SPI1.
+    LL_DMA_REQUEST_SPI1_TX = DMA_REQUEST_SPI1_TX, ///< SPI1 的 DMA 发送请求。 DMA transmit request for SPI1.
+    LL_DMA_REQUEST_SPI2_RX = DMA_REQUEST_SPI2_RX, ///< SPI2 的 DMA 接收请求。 DMA receive request for SPI2.
+    LL_DMA_REQUEST_SPI2_TX = DMA_REQUEST_SPI2_TX, ///< SPI2 的 DMA 发送请求。 DMA transmit request for SPI2.
+    LL_DMA_REQUEST_SPI3_RX = DMA_REQUEST_SPI3_RX, ///< SPI3 的 DMA 接收请求。 DMA receive request for SPI3.
+    LL_DMA_REQUEST_SPI3_TX = DMA_REQUEST_SPI3_TX, ///< SPI3 的 DMA 发送请求。 DMA transmit request for SPI3.
+    LL_DMA_REQUEST_I2C0_RX = DMA_REQUEST_I2C0_RX, ///< I2C0 的 DMA 接收请求。 DMA receive request for I2C0.
+    LL_DMA_REQUEST_I2C0_TX = DMA_REQUEST_I2C0_TX, ///< I2C0 的 DMA 发送请求。 DMA transmit request for I2C0.
+    LL_DMA_REQUEST_I2C1_RX = DMA_REQUEST_I2C1_RX, ///< I2C1 的 DMA 接收请求。 DMA receive request for I2C1.
+    LL_DMA_REQUEST_I2C1_TX = DMA_REQUEST_I2C1_TX, ///< I2C1 的 DMA 发送请求。 DMA transmit request for I2C1.
+    LL_DMA_REQUEST_I2C2_RX = DMA_REQUEST_I2C2_RX, ///< I2C2 的 DMA 接收请求。 DMA receive request for I2C2.
+    LL_DMA_REQUEST_I2C2_TX = DMA_REQUEST_I2C2_TX, ///< I2C2 的 DMA 发送请求。 DMA transmit request for I2C2.
+    LL_DMA_REQUEST_I2C3_RX = DMA_REQUEST_I2C3_RX, ///< I2C3 的 DMA 接收请求。 DMA receive request for I2C3.
+    LL_DMA_REQUEST_I2C3_TX = DMA_REQUEST_I2C3_TX, ///< I2C3 的 DMA 发送请求。 DMA transmit request for I2C3.
+    LL_DMA_REQUEST_I2C4_RX = DMA_REQUEST_I2C4_RX, ///< I2C4 的 DMA 接收请求。 DMA receive request for I2C4.
+    LL_DMA_REQUEST_I2C4_TX = DMA_REQUEST_I2C4_TX, ///< I2C4 的 DMA 发送请求。 DMA transmit request for I2C4.
+} sg200x_ll_dma_request_t;
 
 /**
  * @brief 调用者持有的 DMA 初始化参数 / Caller-owned DMA initialization parameters.
@@ -90,15 +90,15 @@ typedef struct
     uintptr_t destination; ///< 数据目的地址。 Destination data address.
     uint32_t
         count; ///< 所选元素宽度的数据项数量，不是字节数。 Item count of the selected width, not a byte count.
-    sgll_dma_direction_t direction; ///< 数据传输方向。 Data-transfer direction.
-    sgll_dma_width_t width;         ///< 字节或半字元素宽度。 Byte or half-word item width.
-    sgll_dma_mode_t mode;           ///< 普通或循环模式。 Normal or circular mode.
-    sgll_dma_request_t
+    sg200x_ll_dma_direction_t direction; ///< 数据传输方向。 Data-transfer direction.
+    sg200x_ll_dma_width_t width;         ///< 字节或半字元素宽度。 Byte or half-word item width.
+    sg200x_ll_dma_mode_t mode;           ///< 普通或循环模式。 Normal or circular mode.
+    sg200x_ll_dma_request_t
         request; ///< 外设请求编号，内存复制使用 NONE。 Peripheral request ID; memory copy uses NONE.
     uint32_t priority; ///< 通道优先级，范围为 0 到 7。 Channel priority from 0 through 7.
     uintptr_t next; ///< 循环模式下 0 表示自链接，否则是 64 字节对齐的下一项地址。 In circular mode, zero
         ///< self-links; otherwise use a 64-byte-aligned next-item address.
-} sgll_dma_init_t;
+} sg200x_ll_dma_init_t;
 
 /**
  * @brief 获取 DMA 通道的寄存器块 / Get a DMA channel's register block.
@@ -106,7 +106,7 @@ typedef struct
  * @param channel DMA 通道编号，范围为 0 到 7 / DMA channel index from 0 through 7.
  * @return 有效通道指针；编号无效时返回空指针 / Channel pointer, or null for an invalid index.
  */
-static inline DMA_Channel_Type *sgll_dma_channel_get(uint32_t channel)
+static inline DMA_Channel_Type *sg200x_ll_dma_channel_get(uint32_t channel)
 {
     return channel < DMA_CHANNEL_COUNT ? &DMA->CHANNEL[channel] : (DMA_Channel_Type *)0;
 }
@@ -117,9 +117,9 @@ static inline DMA_Channel_Type *sgll_dma_channel_get(uint32_t channel)
  * @param channel DMA 通道编号，范围为 0 到 7 / DMA channel index from 0 through 7.
  * @return 寄存器块地址；编号无效时返回 0 / Register-block address, or zero for an invalid index.
  */
-static inline uintptr_t sgll_dma_channel_address(uint32_t channel)
+static inline uintptr_t sg200x_ll_dma_channel_address(uint32_t channel)
 {
-    return (uintptr_t)sgll_dma_channel_get(channel);
+    return (uintptr_t)sg200x_ll_dma_channel_get(channel);
 }
 
 /**
@@ -128,7 +128,7 @@ static inline uintptr_t sgll_dma_channel_address(uint32_t channel)
  * @param channel DMA 通道编号，范围为 0 到 7 / DMA channel index from 0 through 7.
  * @return 编号在 0 到 7 之间时为 true / True for channel indices from 0 through 7.
  */
-static inline bool sgll_dma_channel_is_valid(uint32_t channel) { return channel < DMA_CHANNEL_COUNT; }
+static inline bool sg200x_ll_dma_channel_is_valid(uint32_t channel) { return channel < DMA_CHANNEL_COUNT; }
 
 /**
  * @brief 设置 DMA 控制器及全局中断使能 / Set DMA controller and global interrupt enables.
@@ -136,7 +136,7 @@ static inline bool sgll_dma_channel_is_valid(uint32_t channel) { return channel 
  * @param enable 为 true 时使能，为 false 时禁止 / True to enable; false to disable.
  * @param enable_interrupts DMA 全局中断使能状态 / DMA global interrupt-enable state.
  */
-static inline void sgll_dma_enable(bool enable, bool enable_interrupts)
+static inline void sg200x_ll_dma_enable(bool enable, bool enable_interrupts)
 {
     DMA->GLOBAL.CFG =
         (enable ? DMA_CFG_DMAC_ENABLE_BIT : 0U) | (enable_interrupts ? DMA_CFG_INTERRUPT_ENABLE_BIT : 0U);
@@ -147,7 +147,7 @@ static inline void sgll_dma_enable(bool enable, bool enable_interrupts)
  *
  * @return CHEN 原始值，低 8 位表示通道使能状态 / Raw CHEN value; the low eight bits report channel enables.
  */
-static inline uint32_t sgll_dma_enabled_channels_get(void) { return DMA->GLOBAL.CHEN; }
+static inline uint32_t sg200x_ll_dma_enabled_channels_get(void) { return DMA->GLOBAL.CHEN; }
 
 /**
  * @brief 请求停止一个 DMA 通道 / Request that one DMA channel be disabled.
@@ -156,11 +156,11 @@ static inline uint32_t sgll_dma_enabled_channels_get(void) { return DMA->GLOBAL.
  * @note 此函数只发出请求；复用资源前须等待通道停止。
  *       This function only issues a request; wait for disable completion before reusing resources.
  */
-static inline void sgll_dma_channel_disable_request(uint32_t channel)
+static inline void sg200x_ll_dma_channel_disable_request(uint32_t channel)
 {
-    if (sgll_dma_channel_is_valid(channel))
+    if (sg200x_ll_dma_channel_is_valid(channel))
     {
-        DMA->GLOBAL.CHEN = SGLL_BIT(channel) << DMA_CHANNEL_WRITE_ENABLE_SHIFT;
+        DMA->GLOBAL.CHEN = LL_BIT(channel) << DMA_CHANNEL_WRITE_ENABLE_SHIFT;
     }
 }
 
@@ -173,7 +173,7 @@ static inline void sgll_dma_channel_disable_request(uint32_t channel)
  * @note 掩码仅可包含低 8 位，调用者负责共享通道所有权。
  *       The mask may contain only the low eight bits; the caller manages shared-channel ownership.
  */
-static inline void sgll_dma_channels_disable_request(uint32_t channels)
+static inline void sg200x_ll_dma_channels_disable_request(uint32_t channels)
 {
     DMA->GLOBAL.CHEN = channels << DMA_CHANNEL_WRITE_ENABLE_SHIFT;
 }
@@ -183,11 +183,11 @@ static inline void sgll_dma_channels_disable_request(uint32_t channels)
  *
  * @param channel DMA 通道编号，范围为 0 到 7 / DMA channel index from 0 through 7.
  */
-static inline void sgll_dma_channel_enable(uint32_t channel)
+static inline void sg200x_ll_dma_channel_enable(uint32_t channel)
 {
-    if (sgll_dma_channel_is_valid(channel))
+    if (sg200x_ll_dma_channel_is_valid(channel))
     {
-        DMA->GLOBAL.CHEN = SGLL_BIT(channel) | (SGLL_BIT(channel) << DMA_CHANNEL_WRITE_ENABLE_SHIFT);
+        DMA->GLOBAL.CHEN = LL_BIT(channel) | (LL_BIT(channel) << DMA_CHANNEL_WRITE_ENABLE_SHIFT);
     }
 }
 
@@ -198,11 +198,11 @@ static inline void sgll_dma_channel_enable(uint32_t channel)
  * @note 此函数只发出请求；复用资源前须等待通道停止。
  *       This function only issues a request; wait for disable completion before reusing resources.
  */
-static inline void sgll_dma_channel_abort(uint32_t channel)
+static inline void sg200x_ll_dma_channel_abort(uint32_t channel)
 {
-    if (sgll_dma_channel_is_valid(channel))
+    if (sg200x_ll_dma_channel_is_valid(channel))
     {
-        DMA->GLOBAL.CHABORT = SGLL_BIT(channel) | (SGLL_BIT(channel) << DMA_CHANNEL_WRITE_ENABLE_SHIFT);
+        DMA->GLOBAL.CHABORT = LL_BIT(channel) | (LL_BIT(channel) << DMA_CHANNEL_WRITE_ENABLE_SHIFT);
     }
 }
 
@@ -215,7 +215,7 @@ static inline void sgll_dma_channel_abort(uint32_t channel)
  * @note 掩码仅可包含低 8 位，调用者负责共享通道所有权。
  *       The mask may contain only the low eight bits; the caller manages shared-channel ownership.
  */
-static inline void sgll_dma_channels_abort(uint32_t channels)
+static inline void sg200x_ll_dma_channels_abort(uint32_t channels)
 {
     DMA->GLOBAL.CHABORT = channels | (channels << DMA_CHANNEL_WRITE_ENABLE_SHIFT);
 }
@@ -228,7 +228,7 @@ static inline void sgll_dma_channels_abort(uint32_t channels)
  * @pre channel 必须在 0 到 7 之间；此辅助函数不检查范围。
  *      channel must be from 0 through 7; this helper does not check bounds.
  */
-static inline volatile uint32_t *sgll_dma_remap_reg(uint32_t channel)
+static inline volatile uint32_t *sg200x_ll_dma_remap_reg(uint32_t channel)
 {
     return channel < DMA_REMAP_CHANNELS_PER_REGISTER ? &TOP->DMA_REMAP0 : &TOP->DMA_REMAP1;
 }
@@ -243,13 +243,13 @@ static inline volatile uint32_t *sgll_dma_remap_reg(uint32_t channel)
  *       Invalid channels or requests exceeding the six-bit field cause no write; valid inputs use
  *       read-modify-write.
  */
-static inline void sgll_dma_request_route_set(uint32_t channel, uint32_t request)
+static inline void sg200x_ll_dma_request_route_set(uint32_t channel, uint32_t request)
 {
     if (channel >= DMA_CHANNEL_COUNT || request > DMA_REMAP_REQUEST_MASK)
     {
         return;
     }
-    volatile uint32_t *reg = sgll_dma_remap_reg(channel);
+    volatile uint32_t *reg = sg200x_ll_dma_remap_reg(channel);
     const uint32_t shift = (channel % DMA_REMAP_CHANNELS_PER_REGISTER) * DMA_REMAP_REQUEST_SHIFT;
     uint32_t value = *reg;
     value = (value & ~(DMA_REMAP_REQUEST_MASK << shift)) | (request << shift) | DMA_REMAP_ENABLE_BIT;
@@ -262,13 +262,13 @@ static inline void sgll_dma_request_route_set(uint32_t channel, uint32_t request
  * @param channel DMA 通道编号，范围为 0 到 7 / DMA channel index from 0 through 7.
  * @return 请求编号；通道无效时返回 0 / Request number, or zero for an invalid channel.
  */
-static inline uint32_t sgll_dma_request_route_get(uint32_t channel)
+static inline uint32_t sg200x_ll_dma_request_route_get(uint32_t channel)
 {
     if (channel >= DMA_CHANNEL_COUNT)
     {
         return 0U;
     }
-    const volatile uint32_t *reg = sgll_dma_remap_reg(channel);
+    const volatile uint32_t *reg = sg200x_ll_dma_remap_reg(channel);
     return (*reg >> ((channel % DMA_REMAP_CHANNELS_PER_REGISTER) * DMA_REMAP_REQUEST_SHIFT)) &
            DMA_REMAP_REQUEST_MASK;
 }
@@ -280,9 +280,9 @@ static inline uint32_t sgll_dma_request_route_get(uint32_t channel)
  * @param status 写入 INTCLEAR 的清除位掩码，置 1 清除对应状态。
  *        Mask written to INTCLEAR; each set bit clears its status.
  */
-static inline void sgll_dma_channel_interrupt_clear(uint32_t channel, uint32_t status)
+static inline void sg200x_ll_dma_channel_interrupt_clear(uint32_t channel, uint32_t status)
 {
-    DMA_Channel_Type *const ch = sgll_dma_channel_get(channel);
+    DMA_Channel_Type *const ch = sg200x_ll_dma_channel_get(channel);
     if (ch != (DMA_Channel_Type *)0)
     {
         ch->INTCLEAR = status;
@@ -295,9 +295,9 @@ static inline void sgll_dma_channel_interrupt_clear(uint32_t channel, uint32_t s
  * @param channel DMA 通道编号，范围为 0 到 7 / DMA channel index from 0 through 7.
  * @return INTSTATUS 值；通道无效时返回 0 / INTSTATUS value, or zero for an invalid channel.
  */
-static inline uint32_t sgll_dma_channel_interrupt_status_get(uint32_t channel)
+static inline uint32_t sg200x_ll_dma_channel_interrupt_status_get(uint32_t channel)
 {
-    DMA_Channel_Type *const ch = sgll_dma_channel_get(channel);
+    DMA_Channel_Type *const ch = sg200x_ll_dma_channel_get(channel);
     return ch == (DMA_Channel_Type *)0 ? 0U : ch->INTSTATUS;
 }
 
@@ -309,9 +309,9 @@ static inline uint32_t sgll_dma_channel_interrupt_status_get(uint32_t channel)
  * @param mask 同时写入 INTSTATUS_EN 和 INTSIGNAL_EN 的使能掩码。
  *        Enable mask written to both INTSTATUS_EN and INTSIGNAL_EN.
  */
-static inline void sgll_dma_channel_interrupt_configure(uint32_t channel, uint32_t mask)
+static inline void sg200x_ll_dma_channel_interrupt_configure(uint32_t channel, uint32_t mask)
 {
-    DMA_Channel_Type *const ch = sgll_dma_channel_get(channel);
+    DMA_Channel_Type *const ch = sg200x_ll_dma_channel_get(channel);
     if (ch != (DMA_Channel_Type *)0)
     {
         ch->INTSTATUS_EN = mask;
@@ -334,22 +334,23 @@ static inline void sgll_dma_channel_interrupt_configure(uint32_t channel, uint32
  *       This encoding helper assumes valid enums and channel arguments; it does not allocate resources or
  *       synchronize caches.
  */
-static inline uint64_t sgll_dma_control_build(
-    sgll_dma_direction_t direction, sgll_dma_width_t width, sgll_dma_mode_t mode, uintptr_t lli_address
+static inline uint64_t sg200x_ll_dma_control_build(
+    sg200x_ll_dma_direction_t direction, sg200x_ll_dma_width_t width, sg200x_ll_dma_mode_t mode,
+    uintptr_t lli_address
 )
 {
     uint64_t control = DMA_CTL_IOC_BLOCK_BIT | DMA_CTL_SMS_BIT | DMA_CTL_DMS_BIT;
     control |= (uint64_t)width << DMA_CTL_SRC_WIDTH_SHIFT;
     control |= (uint64_t)width << DMA_CTL_DST_WIDTH_SHIFT;
-    if (direction == SGLL_DMA_MEMORY_TO_PERIPHERAL)
+    if (direction == LL_DMA_MEMORY_TO_PERIPHERAL)
     {
         control |= DMA_CTL_DINC_BIT;
     }
-    else if (direction == SGLL_DMA_PERIPHERAL_TO_MEMORY)
+    else if (direction == LL_DMA_PERIPHERAL_TO_MEMORY)
     {
         control |= DMA_CTL_SINC_BIT;
     }
-    if (mode == SGLL_DMA_MODE_CIRCULAR)
+    if (mode == LL_DMA_MODE_CIRCULAR)
     {
         (void)lli_address;
         control |= DMA_CTL_LLI_VALID_BIT;
@@ -374,21 +375,21 @@ static inline uint64_t sgll_dma_control_build(
  *       This encoding helper assumes valid enums and channel arguments; it does not allocate resources or
  *       synchronize caches.
  */
-static inline uint64_t sgll_dma_config_build(sgll_dma_direction_t direction, uint32_t channel)
+static inline uint64_t sg200x_ll_dma_config_build(sg200x_ll_dma_direction_t direction, uint32_t channel)
 {
     uint64_t config = DMA_CFG_SRC_MULTIBLK_LLI | DMA_CFG_DST_MULTIBLK_LLI;
     config |= (uint64_t)DMA_CFG_PRIORITY_MAX << DMA_CFG_PRIORITY_SHIFT;
     config |= (uint64_t)DMA_CFG_OSR_MAX << DMA_CFG_SRC_OSR_SHIFT;
     config |= (uint64_t)DMA_CFG_OSR_MAX << DMA_CFG_DST_OSR_SHIFT;
-    if (direction == SGLL_DMA_MEMORY_TO_PERIPHERAL)
+    if (direction == LL_DMA_MEMORY_TO_PERIPHERAL)
     {
         config |= 1ULL << DMA_CFG_TTFC_SHIFT;
     }
-    else if (direction == SGLL_DMA_PERIPHERAL_TO_MEMORY)
+    else if (direction == LL_DMA_PERIPHERAL_TO_MEMORY)
     {
         config |= 2ULL << DMA_CFG_TTFC_SHIFT;
     }
-    if (direction != SGLL_DMA_MEMORY_TO_MEMORY)
+    if (direction != LL_DMA_MEMORY_TO_MEMORY)
     {
         config |= (uint64_t)channel << DMA_CFG_SRC_PER_SHIFT;
         config |= (uint64_t)channel << DMA_CFG_DST_PER_SHIFT;
@@ -403,7 +404,7 @@ static inline uint64_t sgll_dma_config_build(sgll_dma_direction_t direction, uin
  * @param address 待检查或配置的地址 / Address to check or configure.
  * @return 地址满足描述符对齐约束时为 true / True when the address meets descriptor-alignment requirements.
  */
-static inline bool sgll_dma_lli_address_is_valid(uintptr_t address)
+static inline bool sg200x_ll_dma_lli_address_is_valid(uintptr_t address)
 {
     return address != 0U && (address & (DMA_LLI_ALIGNMENT - 1U)) == 0U;
 }
@@ -422,7 +423,7 @@ extern "C"
      *       Defaults are byte-wide normal memory copy at priority zero; supply addresses and a count. A null
      *       pointer is ignored.
      */
-    void sgll_dma_struct_init(sgll_dma_init_t *config);
+    void sg200x_ll_dma_struct_init(sg200x_ll_dma_init_t *config);
 
     /**
      * @brief 初始化调用者拥有的已停止通道及其描述符。
@@ -441,7 +442,7 @@ extern "C"
      *       Before enabling the channel, maintain payload caches by direction and clean the descriptor;
      *       circular mode self-links when next is zero.
      */
-    bool sgll_dma_init(uint32_t channel, DMA_LLI_Type *lli, const sgll_dma_init_t *config);
+    bool sg200x_ll_dma_init(uint32_t channel, DMA_LLI_Type *lli, const sg200x_ll_dma_init_t *config);
 
     /**
      * @brief 清理一个已停止的 DMA 通道 / Clear one stopped DMA channel.
@@ -453,7 +454,7 @@ extern "C"
      *       Request disable and wait for completion first; other channels, the global controller, and request
      *       mappings are preserved.
      */
-    bool sgll_dma_deinit(uint32_t channel);
+    bool sg200x_ll_dma_deinit(uint32_t channel);
 
     /**
      * @brief 构造一个调用者提供存储的 DMA 链表描述符。
@@ -480,9 +481,10 @@ extern "C"
      *       All nonzero links are 64-byte aligned; circular mode requires a nonzero next. Clean the
      *       descriptor cache before submission.
      */
-    bool sgll_dma_lli_build(
+    bool sg200x_ll_dma_lli_build(
         DMA_LLI_Type *lli, uintptr_t source, uintptr_t destination, uint32_t count,
-        sgll_dma_direction_t direction, sgll_dma_width_t width, sgll_dma_mode_t mode, uintptr_t next
+        sg200x_ll_dma_direction_t direction, sg200x_ll_dma_width_t width, sg200x_ll_dma_mode_t mode,
+        uintptr_t next
     );
 
     /**
@@ -490,8 +492,8 @@ extern "C"
      *        Write CFG and the linked-list address of a stopped channel.
      *
      * @param channel DMA 通道编号，范围为 0 到 7 / DMA channel index from 0 through 7.
-     * @param config 由 sgll_dma_config_build 构造的通道 CFG 编码。
-     *        Channel CFG encoding produced by sgll_dma_config_build.
+     * @param config 由 sg200x_ll_dma_config_build 构造的通道 CFG 编码。
+     *        Channel CFG encoding produced by sg200x_ll_dma_config_build.
      * @param lli_address 非零且按 64 字节对齐的链表描述符地址。
      *        Nonzero, 64-byte-aligned linked-list descriptor address.
      * @return 通道和描述符地址有效时返回 true；否则不写寄存器。
@@ -500,7 +502,7 @@ extern "C"
      *      The caller must first stop the channel; this function only checks the index and descriptor
      *      address.
      */
-    bool sgll_dma_channel_configure(uint32_t channel, uint64_t config, uintptr_t lli_address);
+    bool sg200x_ll_dma_channel_configure(uint32_t channel, uint64_t config, uintptr_t lli_address);
 
     /**
      * @brief 有界轮询等待 DMA 通道停止。
@@ -512,7 +514,7 @@ extern "C"
      * @return 观察到通道停止时为 true；通道无效或次数耗尽时为 false。
      *         True when disabled is observed; false for an invalid channel or exhausted attempts.
      */
-    bool sgll_dma_channel_wait_disabled(uint32_t channel, uint32_t attempts);
+    bool sg200x_ll_dma_channel_wait_disabled(uint32_t channel, uint32_t attempts);
 
 #ifdef __cplusplus
 }
@@ -525,10 +527,10 @@ extern "C"
  * @return 块完成及错误位；普通模式还包含传输完成位。
  *         Block-completion and error bits, plus transfer-completion in normal mode.
  */
-static inline uint32_t sgll_dma_interrupt_mask(sgll_dma_mode_t mode)
+static inline uint32_t sg200x_ll_dma_interrupt_mask(sg200x_ll_dma_mode_t mode)
 {
     return DMA_INT_BLOCK_DONE_BIT | DMA_INT_ERROR_MASK |
-           (mode == SGLL_DMA_MODE_NORMAL ? DMA_INT_TRANSFER_DONE_BIT : 0U);
+           (mode == LL_DMA_MODE_NORMAL ? DMA_INT_TRANSFER_DONE_BIT : 0U);
 }
 
 #ifdef __cplusplus
@@ -544,7 +546,7 @@ extern "C"
      * @return 全部停止时为 true；掩码无效或超时为 false。
      *        True when all have stopped; false for an invalid mask or timeout.
      */
-    bool sgll_dma_channels_wait_disabled(uint32_t channels, uint32_t attempts);
+    bool sg200x_ll_dma_channels_wait_disabled(uint32_t channels, uint32_t attempts);
 
 #ifdef __cplusplus
 }

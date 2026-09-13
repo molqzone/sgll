@@ -9,7 +9,7 @@
  * @param index 主域控制器编号 / Main-domain controller index.
  * @return 实例指针；编号无效返回空指针 / Instance pointer, or null for an invalid index.
  */
-static inline GPIO_Type *sgll_gpio_get(uint32_t index)
+static inline GPIO_Type *sg200x_ll_gpio_get(uint32_t index)
 {
     switch (index)
     {
@@ -32,7 +32,7 @@ static inline GPIO_Type *sgll_gpio_get(uint32_t index)
  * @return 主域编号；RTC 或未知实例返回 GPIO_COUNT。
  *        Main-domain index; GPIO_COUNT for RTC or unknown instances.
  */
-static inline uint32_t sgll_gpio_index_get(const GPIO_Type *gpio)
+static inline uint32_t sg200x_ll_gpio_index_get(const GPIO_Type *gpio)
 {
     if (gpio == GPIO0_REGS)
         return 0U;
@@ -50,21 +50,21 @@ static inline uint32_t sgll_gpio_index_get(const GPIO_Type *gpio)
  * @param gpio GPIO 寄存器实例，支持主域和 RTC 域 / GPIO register instance in the main or RTC domain.
  * @return 端口位掩码 / Port bit mask.
  */
-static inline uint32_t sgll_gpio_input_get(const GPIO_Type *gpio) { return gpio->EXT_PORTA; }
+static inline uint32_t sg200x_ll_gpio_input_get(const GPIO_Type *gpio) { return gpio->EXT_PORTA; }
 
 /**
  * @brief 读取 GPIO 输出锁存值 / Read the GPIO output latch.
  * @param gpio GPIO 寄存器实例，支持主域和 RTC 域 / GPIO register instance in the main or RTC domain.
  * @return 端口位掩码 / Port bit mask.
  */
-static inline uint32_t sgll_gpio_output_get(const GPIO_Type *gpio) { return gpio->SWPORTA_DR; }
+static inline uint32_t sg200x_ll_gpio_output_get(const GPIO_Type *gpio) { return gpio->SWPORTA_DR; }
 
 /**
  * @brief 读取屏蔽后的 GPIO 中断状态 / Read masked GPIO interrupt status.
  * @param gpio GPIO 寄存器实例，支持主域和 RTC 域 / GPIO register instance in the main or RTC domain.
  * @return 端口位掩码 / Port bit mask.
  */
-static inline uint32_t sgll_gpio_interrupt_status_get(const GPIO_Type *gpio) { return gpio->INTSTATUS; }
+static inline uint32_t sg200x_ll_gpio_interrupt_status_get(const GPIO_Type *gpio) { return gpio->INTSTATUS; }
 
 /**
  * @brief 设置选定引脚的输出锁存电平 / Set the output latch level of selected pins.
@@ -74,7 +74,7 @@ static inline uint32_t sgll_gpio_interrupt_status_get(const GPIO_Type *gpio) { r
  * @pre 调用者独占选定引脚，并串行化同一端口的读改写。
  *        The caller owns the selected pins and serializes read-modify-write on the port.
  */
-static inline void sgll_gpio_output_write(GPIO_Type *gpio, uint32_t pins, bool high)
+static inline void sg200x_ll_gpio_output_write(GPIO_Type *gpio, uint32_t pins, bool high)
 {
     const uint32_t current = gpio->SWPORTA_DR;
     gpio->SWPORTA_DR = high ? current | pins : current & ~pins;
@@ -88,7 +88,7 @@ static inline void sgll_gpio_output_write(GPIO_Type *gpio, uint32_t pins, bool h
  * @pre 调用者独占选定引脚，并串行化同一端口的读改写。
  *        The caller owns the selected pins and serializes read-modify-write on the port.
  */
-static inline void sgll_gpio_output_enable(GPIO_Type *gpio, uint32_t pins, bool enable)
+static inline void sg200x_ll_gpio_output_enable(GPIO_Type *gpio, uint32_t pins, bool enable)
 {
     const uint32_t current = gpio->SWPORTA_DDR;
     gpio->SWPORTA_DDR = enable ? current | pins : current & ~pins;
@@ -102,7 +102,7 @@ static inline void sgll_gpio_output_enable(GPIO_Type *gpio, uint32_t pins, bool 
  * @pre 调用者独占选定引脚，并串行化同一端口的读改写。
  *        The caller owns the selected pins and serializes read-modify-write on the port.
  */
-static inline void sgll_gpio_interrupt_enable(GPIO_Type *gpio, uint32_t pins, bool enable)
+static inline void sg200x_ll_gpio_interrupt_enable(GPIO_Type *gpio, uint32_t pins, bool enable)
 {
     const uint32_t current = gpio->INTEN;
     gpio->INTEN = enable ? current | pins : current & ~pins;
@@ -116,7 +116,7 @@ static inline void sgll_gpio_interrupt_enable(GPIO_Type *gpio, uint32_t pins, bo
  * @pre 调用者独占选定引脚，并串行化同一端口的读改写。
  *        The caller owns the selected pins and serializes read-modify-write on the port.
  */
-static inline void sgll_gpio_interrupt_mask(GPIO_Type *gpio, uint32_t pins, bool masked)
+static inline void sg200x_ll_gpio_interrupt_mask(GPIO_Type *gpio, uint32_t pins, bool masked)
 {
     const uint32_t current = gpio->INTMASK;
     gpio->INTMASK = masked ? current | pins : current & ~pins;
@@ -130,7 +130,7 @@ static inline void sgll_gpio_interrupt_mask(GPIO_Type *gpio, uint32_t pins, bool
  * @pre 调用者独占选定引脚，并串行化同一端口的读改写。
  *        The caller owns the selected pins and serializes read-modify-write on the port.
  */
-static inline void sgll_gpio_interrupt_edge_set(GPIO_Type *gpio, uint32_t pins, bool edge)
+static inline void sg200x_ll_gpio_interrupt_edge_set(GPIO_Type *gpio, uint32_t pins, bool edge)
 {
     const uint32_t current = gpio->INTTYPE_LEVEL;
     gpio->INTTYPE_LEVEL = edge ? current | pins : current & ~pins;
@@ -144,7 +144,7 @@ static inline void sgll_gpio_interrupt_edge_set(GPIO_Type *gpio, uint32_t pins, 
  * @pre 调用者独占选定引脚，并串行化同一端口的读改写。
  *        The caller owns the selected pins and serializes read-modify-write on the port.
  */
-static inline void sgll_gpio_interrupt_polarity_set(GPIO_Type *gpio, uint32_t pins, bool active_high)
+static inline void sg200x_ll_gpio_interrupt_polarity_set(GPIO_Type *gpio, uint32_t pins, bool active_high)
 {
     const uint32_t current = gpio->INT_POLARITY;
     gpio->INT_POLARITY = active_high ? current | pins : current & ~pins;
@@ -157,4 +157,4 @@ static inline void sgll_gpio_interrupt_polarity_set(GPIO_Type *gpio, uint32_t pi
  * @note 直接写 PORTA_EOI，不对清除寄存器做读改写。
  *        Writes PORTA_EOI directly without read-modify-write on the clear register.
  */
-static inline void sgll_gpio_interrupt_clear(GPIO_Type *gpio, uint32_t pins) { gpio->PORTA_EOI = pins; }
+static inline void sg200x_ll_gpio_interrupt_clear(GPIO_Type *gpio, uint32_t pins) { gpio->PORTA_EOI = pins; }

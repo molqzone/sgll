@@ -18,7 +18,7 @@ static const rstgen_reset_location_t rstgen_reset_locations[RESET_TARGET_COUNT] 
 };
 #undef RESET_LOCATION
 
-rstgen_reset_location_t sgll_rcc_reset_loc_get(rstgen_reset_target_t target)
+rstgen_reset_location_t sg200x_ll_rcc_reset_loc_get(rstgen_reset_target_t target)
 {
     if ((unsigned)target < (unsigned)RESET_TARGET_COUNT)
     {
@@ -34,7 +34,7 @@ rstgen_reset_location_t sgll_rcc_reset_loc_get(rstgen_reset_target_t target)
  *
  * @param member CLKGEN_Type 中的成员选择表达式 / Member designator in CLKGEN_Type.
  */
-volatile uint32_t *sgll_rcc_clkgen_reg(uint32_t offset)
+volatile uint32_t *sg200x_ll_rcc_clkgen_reg(uint32_t offset)
 {
     switch (offset)
     {
@@ -48,10 +48,10 @@ volatile uint32_t *sgll_rcc_clkgen_reg(uint32_t offset)
     }
 }
 
-void sgll_rcc_rtc_saradc_enable(void)
+void sg200x_ll_rcc_rtc_saradc_enable(void)
 {
     RTC_CTRL_REGS->CLOCK_MUX &= ~RTC_CTRL_SARADC_OSC_DIV_BIT;
-    sgll_csr_fence_io();
+    sg200x_ll_csr_fence_io();
     RTC_CTRL_REGS->RESET |= RTC_CTRL_SARADC_RESETN_BIT;
-    sgll_csr_fence_io();
+    sg200x_ll_csr_fence_io();
 }

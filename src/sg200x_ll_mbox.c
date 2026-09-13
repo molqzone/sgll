@@ -13,18 +13,18 @@
  */
 static void invalidate(uintptr_t address, size_t length)
 {
-    sgll_csr_fence_io();
+    sg200x_ll_csr_fence_io();
 #if defined(__riscv)
     if (length != 0U)
     {
-        sgll_csr_dcache_invalidate_range(address, length);
+        sg200x_ll_csr_dcache_invalidate_range(address, length);
     }
 #else
 
     (void)address;
     (void)length;
 #endif
-    sgll_csr_fence_io();
+    sg200x_ll_csr_fence_io();
 }
 
 /**
@@ -39,13 +39,13 @@ static void clean(uintptr_t address, size_t length)
 #if defined(__riscv)
     if (length != 0U)
     {
-        sgll_csr_dcache_clean_range(address, length);
+        sg200x_ll_csr_dcache_clean_range(address, length);
     }
 #else
     (void)address;
     (void)length;
 #endif
-    sgll_csr_fence_io();
+    sg200x_ll_csr_fence_io();
 }
 
 /**
@@ -54,7 +54,7 @@ static void clean(uintptr_t address, size_t length)
  * @param[in] config 已验证的邮箱布局 / Validated mailbox layout.
  * @return 易失的 32 位状态字指针 / Pointer to the volatile 32-bit state word.
  */
-static volatile uint32_t *state_word(const sgll_mbox_config_t *config)
+static volatile uint32_t *state_word(const sg200x_ll_mbox_config_t *config)
 {
     return (volatile uint32_t *)(config->base + config->state_offset);
 }
@@ -69,19 +69,19 @@ static volatile uint32_t *state_word(const sgll_mbox_config_t *config)
  *       Only the state line is written back; the peer may use other header and payload lines once it observes
  *       the new state.
  */
-static void publish_state(const sgll_mbox_config_t *config, uint32_t value)
+static void publish_state(const sg200x_ll_mbox_config_t *config, uint32_t value)
 {
-    sgll_csr_fence_io();
+    sg200x_ll_csr_fence_io();
     *state_word(config) = value;
-    sgll_csr_fence_io();
+    sg200x_ll_csr_fence_io();
 #if defined(__riscv)
 
-    sgll_csr_dcache_clean_invalidate_range(config->base + config->state_offset, sizeof(uint32_t));
+    sg200x_ll_csr_dcache_clean_invalidate_range(config->base + config->state_offset, sizeof(uint32_t));
 #endif
-    sgll_csr_fence_io();
+    sg200x_ll_csr_fence_io();
 }
 
-bool sgll_mbox_config_valid(const sgll_mbox_config_t *config)
+bool sg200x_ll_mbox_config_valid(const sg200x_ll_mbox_config_t *config)
 {
     if (config == nullptr || config->base == 0U || config->header_size == 0U ||
         config->header_size > config->size || config->size > UINTPTR_MAX - config->base ||
@@ -89,7 +89,7 @@ bool sgll_mbox_config_valid(const sgll_mbox_config_t *config)
     {
         return false;
     }
-    const uintptr_t mask = SGLL_DCACHE_LINE_SIZE - 1U;
+    const uintptr_t mask = LL_DCACHE_LINE_SIZE - 1U;
     return ((config->base | config->size | config->header_size) & mask) == 0U &&
            config->state_offset % alignof(uint32_t) == 0U &&
            config->state_offset <= config->header_size - sizeof(uint32_t);
@@ -105,7 +105,7 @@ bool sgll_mbox_config_valid(const sgll_mbox_config_t *config)
  * @return 所述地址范围有效且不与共享区重叠时为 true。
  *         True when the range is valid and does not overlap shared memory.
  */
-static bool local_buffer(const sgll_mbox_config_t *config, const void *buffer, size_t length)
+static bool local_buffer(const sg200x_ll_mbox_config_t *config, const void *buffer, size_t length)
 {
     const uintptr_t address = (uintptr_t)buffer;
     return address != 0U && length <= UINTPTR_MAX - address &&
@@ -113,84 +113,85 @@ static bool local_buffer(const sgll_mbox_config_t *config, const void *buffer, s
             (address <= config->base && length <= config->base - address));
 }
 
-sgll_mbox_result_t sgll_mbox_rx_acquire(const sgll_mbox_config_t *config, void *header, size_t capacity)
+sg200x_ll_mbox_result_t
+sg200x_ll_mbox_rx_acquire(const sg200x_ll_mbox_config_t *config, void *header, size_t capacity)
 {
-    if (!sgll_mbox_config_valid(config) || capacity < config->header_size ||
+    if (!sg200x_ll_mbox_config_valid(config) || capacity < config->header_size ||
         !local_buffer(config, header, config->header_size))
     {
-        return SGLL_MBOX_INVALID;
+        return LL_MBOX_INVALID;
     }
     invalidate(config->base + config->state_offset, sizeof(uint32_t));
     if (*state_word(config) != config->ready_state)
     {
-        return SGLL_MBOX_BUSY;
+        return LL_MBOX_BUSY;
     }
 
     invalidate(config->base, config->header_size);
     memcpy(header, (const void *)config->base, config->header_size);
-    return SGLL_MBOX_OK;
+    return LL_MBOX_OK;
 }
 
-sgll_mbox_result_t
-sgll_mbox_rx_payload(const sgll_mbox_config_t *config, size_t length, const uint8_t **payload)
+sg200x_ll_mbox_result_t
+sg200x_ll_mbox_rx_payload(const sg200x_ll_mbox_config_t *config, size_t length, const uint8_t **payload)
 {
-    if (!sgll_mbox_config_valid(config) || length > config->size - config->header_size ||
+    if (!sg200x_ll_mbox_config_valid(config) || length > config->size - config->header_size ||
         !local_buffer(config, payload, sizeof(*payload)))
     {
-        return SGLL_MBOX_INVALID;
+        return LL_MBOX_INVALID;
     }
     if (*state_word(config) != config->ready_state)
     {
-        return SGLL_MBOX_BUSY;
+        return LL_MBOX_BUSY;
     }
     const uintptr_t address = config->base + config->header_size;
     invalidate(address, length);
     *payload = (const uint8_t *)address;
-    return SGLL_MBOX_OK;
+    return LL_MBOX_OK;
 }
 
-sgll_mbox_result_t sgll_mbox_rx_release(const sgll_mbox_config_t *config)
+sg200x_ll_mbox_result_t sg200x_ll_mbox_rx_release(const sg200x_ll_mbox_config_t *config)
 {
-    if (!sgll_mbox_config_valid(config))
+    if (!sg200x_ll_mbox_config_valid(config))
     {
-        return SGLL_MBOX_INVALID;
+        return LL_MBOX_INVALID;
     }
     if (*state_word(config) != config->ready_state)
     {
-        return SGLL_MBOX_BUSY;
+        return LL_MBOX_BUSY;
     }
     publish_state(config, config->empty_state);
-    return SGLL_MBOX_OK;
+    return LL_MBOX_OK;
 }
 
-sgll_mbox_result_t sgll_mbox_tx_acquire(const sgll_mbox_config_t *config)
+sg200x_ll_mbox_result_t sg200x_ll_mbox_tx_acquire(const sg200x_ll_mbox_config_t *config)
 {
-    if (!sgll_mbox_config_valid(config))
+    if (!sg200x_ll_mbox_config_valid(config))
     {
-        return SGLL_MBOX_INVALID;
+        return LL_MBOX_INVALID;
     }
     invalidate(config->base + config->state_offset, sizeof(uint32_t));
     if (*state_word(config) != config->empty_state)
     {
-        return SGLL_MBOX_BUSY;
+        return LL_MBOX_BUSY;
     }
     invalidate(config->base, config->header_size);
-    return SGLL_MBOX_OK;
+    return LL_MBOX_OK;
 }
 
-sgll_mbox_result_t sgll_mbox_tx_publish(const sgll_mbox_config_t *config, size_t length)
+sg200x_ll_mbox_result_t sg200x_ll_mbox_tx_publish(const sg200x_ll_mbox_config_t *config, size_t length)
 {
-    if (!sgll_mbox_config_valid(config) || length > config->size - config->header_size)
+    if (!sg200x_ll_mbox_config_valid(config) || length > config->size - config->header_size)
     {
-        return SGLL_MBOX_INVALID;
+        return LL_MBOX_INVALID;
     }
     if (*state_word(config) != config->empty_state)
     {
-        return SGLL_MBOX_BUSY;
+        return LL_MBOX_BUSY;
     }
-    sgll_csr_fence_io();
+    sg200x_ll_csr_fence_io();
     clean(config->base + config->header_size, length);
     clean(config->base, config->header_size);
     publish_state(config, config->ready_state);
-    return SGLL_MBOX_OK;
+    return LL_MBOX_OK;
 }

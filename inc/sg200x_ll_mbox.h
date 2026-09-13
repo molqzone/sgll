@@ -20,17 +20,17 @@ typedef struct
                          ///< header.
     uint32_t empty_state; ///< 将槽交给生产者的状态值。 State value granting the slot to the producer.
     uint32_t ready_state; ///< 将槽交给消费者的状态值。 State value granting the slot to the consumer.
-} sgll_mbox_config_t;
+} sg200x_ll_mbox_config_t;
 
 /**
  * @brief 非阻塞邮箱操作的结果 / Result of a nonblocking mailbox operation.
  */
 typedef enum
 {
-    SGLL_MBOX_OK,      ///< 操作已完成。 Operation completed.
-    SGLL_MBOX_BUSY,    ///< 槽不处于所需状态。 Slot is not in the required state.
-    SGLL_MBOX_INVALID, ///< 布局、缓冲区或长度无效。 Invalid layout, buffer, or length.
-} sgll_mbox_result_t;
+    LL_MBOX_OK,      ///< 操作已完成。 Operation completed.
+    LL_MBOX_BUSY,    ///< 槽不处于所需状态。 Slot is not in the required state.
+    LL_MBOX_INVALID, ///< 布局、缓冲区或长度无效。 Invalid layout, buffer, or length.
+} sg200x_ll_mbox_result_t;
 
 #ifdef __cplusplus
 extern "C"
@@ -45,7 +45,7 @@ extern "C"
      * @return 对齐、大小、状态位置及地址范围均有效时返回 true。
      *         True when alignment, sizes, state location, and address bounds are valid.
      */
-    bool sgll_mbox_config_valid(const sgll_mbox_config_t *config);
+    bool sg200x_ll_mbox_config_valid(const sg200x_ll_mbox_config_t *config);
 
     /**
      * @brief 取得就绪槽并把头部快照复制到本地 / Acquire a ready slot and copy its header snapshot locally.
@@ -62,7 +62,8 @@ extern "C"
      *       Refresh and observe the state word before refreshing the complete header, so lines cached before
      *       publication cannot enter the snapshot.
      */
-    sgll_mbox_result_t sgll_mbox_rx_acquire(const sgll_mbox_config_t *config, void *header, size_t capacity);
+    sg200x_ll_mbox_result_t
+    sg200x_ll_mbox_rx_acquire(const sg200x_ll_mbox_config_t *config, void *header, size_t capacity);
 
     /**
      * @brief 同步已取得槽的载荷并返回只读视图。
@@ -76,8 +77,8 @@ extern "C"
      * @note 允许零长度消息；载荷视图在释放槽之前有效。
      *       Zero-length messages are allowed; the payload view remains valid until release.
      */
-    sgll_mbox_result_t
-    sgll_mbox_rx_payload(const sgll_mbox_config_t *config, size_t length, const uint8_t **payload);
+    sg200x_ll_mbox_result_t
+    sg200x_ll_mbox_rx_payload(const sg200x_ll_mbox_config_t *config, size_t length, const uint8_t **payload);
 
     /**
      * @brief 在所有读取完成后把消息槽交还生产者。
@@ -88,7 +89,7 @@ extern "C"
      *       Only the state word changes and only its cache line is written back; related DMA reads must
      *       already be complete.
      */
-    sgll_mbox_result_t sgll_mbox_rx_release(const sgll_mbox_config_t *config);
+    sg200x_ll_mbox_result_t sg200x_ll_mbox_rx_release(const sg200x_ll_mbox_config_t *config);
 
     /**
      * @brief 取得空槽以准备就地写入消息 / Acquire an empty slot to prepare a message in place.
@@ -98,7 +99,7 @@ extern "C"
      *       There is one producer; keep the state word empty while filling the header and payload, then call
      *       tx_publish.
      */
-    sgll_mbox_result_t sgll_mbox_tx_acquire(const sgll_mbox_config_t *config);
+    sg200x_ll_mbox_result_t sg200x_ll_mbox_tx_acquire(const sg200x_ll_mbox_config_t *config);
 
     /**
      * @brief 写回头部和载荷后发布就绪状态 / Publish ready state after cleaning the header and payload.
@@ -109,7 +110,7 @@ extern "C"
      *       Ready is set only after message writeback completes; the producer must not modify the slot after
      *       publication.
      */
-    sgll_mbox_result_t sgll_mbox_tx_publish(const sgll_mbox_config_t *config, size_t length);
+    sg200x_ll_mbox_result_t sg200x_ll_mbox_tx_publish(const sg200x_ll_mbox_config_t *config, size_t length);
 
 #ifdef __cplusplus
 }

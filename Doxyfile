@@ -1,10 +1,10 @@
-# 从 sgll 目录运行 doxygen Doxyfile。Run doxygen Doxyfile from the sgll directory.
-PROJECT_NAME           = SGLL
+# 从 sg200x-ll 目录运行 doxygen Doxyfile。Run doxygen Doxyfile from the sg200x-ll directory.
+PROJECT_NAME           = SG200X LL
 PROJECT_BRIEF          = "SG2002 C23 低层接口 / SG2002 C23 low-level interfaces"
 OUTPUT_DIRECTORY       = build/doxygen
 OUTPUT_LANGUAGE        = Chinese
 INPUT_ENCODING         = UTF-8
-INPUT                  = sgll.h inc src
+INPUT                  = sg200x_ll.h inc src
 FILE_PATTERNS          = *.h *.c
 RECURSIVE              = YES
 INCLUDE_PATH           = inc

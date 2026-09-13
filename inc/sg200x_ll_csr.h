@@ -5,7 +5,7 @@
 
 #include "sg2002.h"
 
-#if defined(__riscv) && defined(SGLL_CORE_BACKEND_SDK)
+#if defined(__riscv) && defined(LL_CORE_BACKEND_SDK)
 #include "core_rv64.h"
 #endif
 
@@ -15,7 +15,7 @@
  * @note RISC-V 使用 fence iorw, iorw；宿主构建使用顺序一致的线程屏障。
  *       RISC-V uses fence iorw, iorw; host builds use a sequentially consistent thread fence.
  */
-static inline void sgll_csr_fence_io(void)
+static inline void sg200x_ll_csr_fence_io(void)
 {
 #if defined(__riscv)
     __asm__ __volatile__("fence iorw, iorw" ::: "memory");
@@ -31,9 +31,9 @@ static inline void sgll_csr_fence_io(void)
  *
  * @return 当前 mstatus 值 / Current mstatus value.
  */
-static inline unsigned long sgll_csr_mstatus_read(void)
+static inline unsigned long sg200x_ll_csr_mstatus_read(void)
 {
-#if defined(SGLL_CORE_BACKEND_SDK)
+#if defined(LL_CORE_BACKEND_SDK)
     return (unsigned long)__get_MSTATUS();
 #else
     unsigned long value;
@@ -47,9 +47,9 @@ static inline unsigned long sgll_csr_mstatus_read(void)
  *
  * @param value 要写入的 mstatus 值 / mstatus value to write.
  */
-static inline void sgll_csr_mstatus_write(unsigned long value)
+static inline void sg200x_ll_csr_mstatus_write(unsigned long value)
 {
-#if defined(SGLL_CORE_BACKEND_SDK)
+#if defined(LL_CORE_BACKEND_SDK)
     __set_MSTATUS((uint64_t)value);
 #else
     __asm__ __volatile__("csrw mstatus, %0" ::"r"(value) : "memory");
@@ -61,9 +61,9 @@ static inline void sgll_csr_mstatus_write(unsigned long value)
  *
  * @return 当前 mie 值 / Current mie value.
  */
-static inline unsigned long sgll_csr_mie_read(void)
+static inline unsigned long sg200x_ll_csr_mie_read(void)
 {
-#if defined(SGLL_CORE_BACKEND_SDK)
+#if defined(LL_CORE_BACKEND_SDK)
     return (unsigned long)__get_MIE();
 #else
     unsigned long value;
@@ -77,9 +77,9 @@ static inline unsigned long sgll_csr_mie_read(void)
  *
  * @param value 要写入的 mie 值 / mie value to write.
  */
-static inline void sgll_csr_mie_write(unsigned long value)
+static inline void sg200x_ll_csr_mie_write(unsigned long value)
 {
-#if defined(SGLL_CORE_BACKEND_SDK)
+#if defined(LL_CORE_BACKEND_SDK)
     __set_MIE((uint64_t)value);
 #else
     __asm__ __volatile__("csrw mie, %0" ::"r"(value) : "memory");
@@ -93,9 +93,9 @@ static inline void sgll_csr_mie_write(unsigned long value)
  * @note 此读改写操作不原子；调用者应禁止中断或自行串行化。
  *       This read-modify-write operation is not atomic; disable interrupts or serialize it externally.
  */
-static inline void sgll_csr_mie_set(unsigned long mask)
+static inline void sg200x_ll_csr_mie_set(unsigned long mask)
 {
-#if defined(SGLL_CORE_BACKEND_SDK)
+#if defined(LL_CORE_BACKEND_SDK)
     __set_MIE(__get_MIE() | (uint64_t)mask);
 #else
     unsigned long value;
@@ -112,9 +112,9 @@ static inline void sgll_csr_mie_set(unsigned long mask)
  * @note 此读改写操作不原子；调用者应禁止中断或自行串行化。
  *       This read-modify-write operation is not atomic; disable interrupts or serialize it externally.
  */
-static inline void sgll_csr_mie_clear(unsigned long mask)
+static inline void sg200x_ll_csr_mie_clear(unsigned long mask)
 {
-#if defined(SGLL_CORE_BACKEND_SDK)
+#if defined(LL_CORE_BACKEND_SDK)
     __set_MIE(__get_MIE() & ~(uint64_t)mask);
 #else
     unsigned long value;
@@ -132,9 +132,9 @@ static inline void sgll_csr_mie_clear(unsigned long mask)
  * @note 各中断源的 mie 位和 PLIC 门控仍需单独配置。
  *       Per-source mie bits and PLIC enables must still be configured separately.
  */
-static inline void sgll_csr_global_irq_enable(void)
+static inline void sg200x_ll_csr_global_irq_enable(void)
 {
-#if defined(SGLL_CORE_BACKEND_SDK)
+#if defined(LL_CORE_BACKEND_SDK)
     __enable_irq();
 #else
     __asm__ __volatile__("csrs mstatus, 8" ::: "memory");
@@ -147,9 +147,9 @@ static inline void sgll_csr_global_irq_enable(void)
  * @note 清除 mstatus.MIE（位 3），即 csrc mstatus, 8；两个后端一致。
  *       Clears mstatus.MIE (bit three), that is csrc mstatus, 8; both backends agree.
  */
-static inline void sgll_csr_global_irq_disable(void)
+static inline void sg200x_ll_csr_global_irq_disable(void)
 {
-#if defined(SGLL_CORE_BACKEND_SDK)
+#if defined(LL_CORE_BACKEND_SDK)
     __disable_irq();
 #else
     __asm__ __volatile__("csrc mstatus, 8" ::: "memory");
@@ -161,10 +161,10 @@ static inline void sgll_csr_global_irq_disable(void)
  *
  * @return 供 critical_exit 恢复的完整 mstatus 快照 / Complete mstatus snapshot to restore with critical_exit.
  */
-static inline unsigned long sgll_csr_critical_enter(void)
+static inline unsigned long sg200x_ll_csr_critical_enter(void)
 {
-    unsigned long prior = sgll_csr_mstatus_read();
-    sgll_csr_global_irq_disable();
+    unsigned long prior = sg200x_ll_csr_mstatus_read();
+    sg200x_ll_csr_global_irq_disable();
     return prior;
 }
 
@@ -173,7 +173,7 @@ static inline unsigned long sgll_csr_critical_enter(void)
  *
  * @param prior critical_enter 返回的 mstatus 快照 / The mstatus snapshot returned by critical_enter.
  */
-static inline void sgll_csr_critical_exit(unsigned long prior) { sgll_csr_mstatus_write(prior); }
+static inline void sg200x_ll_csr_critical_exit(unsigned long prior) { sg200x_ll_csr_mstatus_write(prior); }
 
 /**
  * @brief 使能核心的机器外部中断输入 / Enable the core's machine external-interrupt input.
@@ -183,7 +183,7 @@ static inline void sgll_csr_critical_exit(unsigned long prior) { sgll_csr_mstatu
  * @note 仅设置 mie.MEIE；mstatus.MIE 和 PLIC 源使能由调用者或 RTOS 管理。
  *       Only mie.MEIE is set; the caller or RTOS manages mstatus.MIE and PLIC source enables.
  */
-static inline void sgll_csr_external_irq_enable(void) { sgll_csr_mie_set(SGLL_MIE_MEIE_BIT); }
+static inline void sg200x_ll_csr_external_irq_enable(void) { sg200x_ll_csr_mie_set(LL_MIE_MEIE_BIT); }
 
 /**
  * @brief 禁止核心的机器外部中断输入 / Disable the core's machine external-interrupt input.
@@ -193,7 +193,7 @@ static inline void sgll_csr_external_irq_enable(void) { sgll_csr_mie_set(SGLL_MI
  * @note 仅清除 mie.MEIE，不修改 PLIC 中的各源使能位。
  *       Only mie.MEIE is cleared; per-source PLIC enables are unchanged.
  */
-static inline void sgll_csr_external_irq_disable(void) { sgll_csr_mie_clear(SGLL_MIE_MEIE_BIT); }
+static inline void sg200x_ll_csr_external_irq_disable(void) { sg200x_ll_csr_mie_clear(LL_MIE_MEIE_BIT); }
 
 #if __riscv_xlen == 64
 /**
@@ -207,7 +207,7 @@ static inline void sgll_csr_external_irq_disable(void) { sgll_csr_mie_clear(SGLL
  *       Uses rdtime; the SDK time accessors are unusable in this firmware, so both backends share this
  *       implementation.
  */
-static inline uint64_t sgll_csr_time_read(void)
+static inline uint64_t sg200x_ll_csr_time_read(void)
 {
     uint64_t value;
     __asm__ __volatile__("rdtime %0" : "=r"(value));
@@ -225,7 +225,7 @@ static inline uint64_t sgll_csr_time_read(void)
  *       The high word is reread to avoid rollover tearing; C906L uses the RV64 path and this branch keeps
  *       RV32 reuse possible.
  */
-static inline uint64_t sgll_csr_time_read(void)
+static inline uint64_t sg200x_ll_csr_time_read(void)
 {
     uint32_t low;
     uint32_t high0;
@@ -248,7 +248,7 @@ static inline uint64_t sgll_csr_time_read(void)
  * @note 使用真正的 fence.i；SDK 的 __ISB 仅提供数据屏障。
  *       Use a real fence.i; the SDK __ISB only provides a data barrier.
  */
-static inline void sgll_csr_fence_i(void)
+static inline void sg200x_ll_csr_fence_i(void)
 {
     __asm__ __volatile__(".option push\n\t"
                          ".option arch, +zifencei\n\t"
@@ -275,7 +275,7 @@ extern "C"
      *       Invalidation does not write back dirty data; use it only where local cached contents may be
      *       discarded.
      */
-    void sgll_csr_dcache_invalidate_range(uintptr_t addr, size_t size);
+    void sg200x_ll_csr_dcache_invalidate_range(uintptr_t addr, size_t size);
     /**
      * @brief 写回指定范围的脏数据缓存行 / Clean dirty data-cache lines covering a range.
      *
@@ -286,7 +286,7 @@ extern "C"
      * @note 起始地址向下、末地址向上对齐至 64 字节边界，末尾执行 sync.s 等待完成。
      *       The start is rounded down and the end up to 64-byte boundaries; sync.s completes the operation.
      */
-    void sgll_csr_dcache_clean_range(uintptr_t addr, size_t size);
+    void sg200x_ll_csr_dcache_clean_range(uintptr_t addr, size_t size);
     /**
      * @brief 写回并使指定范围的数据缓存失效 / Clean and invalidate data-cache lines covering a range.
      *
@@ -297,7 +297,7 @@ extern "C"
      * @note 起始地址向下、末地址向上对齐至 64 字节边界，末尾执行 sync.s 等待完成。
      *       The start is rounded down and the end up to 64-byte boundaries; sync.s completes the operation.
      */
-    void sgll_csr_dcache_clean_invalidate_range(uintptr_t addr, size_t size);
+    void sg200x_ll_csr_dcache_clean_invalidate_range(uintptr_t addr, size_t size);
 
 #ifdef __cplusplus
 }
@@ -314,7 +314,7 @@ extern "C"
      * @note 仅 RISC-V；每次包含循环开销，不能作为精确时钟周期或时间单位。
      *        RISC-V only; each iteration includes loop overhead and is not an exact cycle or time unit.
      */
-    void sgll_csr_delay_nops(uint32_t iterations);
+    void sg200x_ll_csr_delay_nops(uint32_t iterations);
 
 #ifdef __cplusplus
 }

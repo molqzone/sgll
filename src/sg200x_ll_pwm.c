@@ -14,7 +14,7 @@ static bool pwm_channels_valid(const PWM_Type *pwm, uint32_t channels)
            (channels & ~PWM_CHANNEL_MASK) == 0U;
 }
 
-void sgll_pwm_struct_init(sgll_pwm_init_t *config)
+void sg200x_ll_pwm_struct_init(sg200x_ll_pwm_init_t *config)
 {
     if (config != NULL)
     {
@@ -24,7 +24,7 @@ void sgll_pwm_struct_init(sgll_pwm_init_t *config)
     }
 }
 
-bool sgll_pwm_period_set(PWM_Type *pwm, uint32_t channel, uint32_t period_ticks, uint32_t inactive_ticks)
+bool sg200x_ll_pwm_period_set(PWM_Type *pwm, uint32_t channel, uint32_t period_ticks, uint32_t inactive_ticks)
 {
     if (channel >= PWM_CHANNELS_PER_CONTROLLER || !pwm_channels_valid(pwm, 1U << channel) ||
         period_ticks < 2U || period_ticks > PWM_PERIOD_MAX || inactive_ticks == 0U ||
@@ -37,7 +37,7 @@ bool sgll_pwm_period_set(PWM_Type *pwm, uint32_t channel, uint32_t period_ticks,
     return true;
 }
 
-bool sgll_pwm_init(PWM_Type *pwm, uint32_t channel, const sgll_pwm_init_t *config)
+bool sg200x_ll_pwm_init(PWM_Type *pwm, uint32_t channel, const sg200x_ll_pwm_init_t *config)
 {
     if (config == NULL || channel >= PWM_CHANNELS_PER_CONTROLLER || !pwm_channels_valid(pwm, 1U << channel))
     {
@@ -45,48 +45,48 @@ bool sgll_pwm_init(PWM_Type *pwm, uint32_t channel, const sgll_pwm_init_t *confi
     }
     const uint32_t mask = 1U << channel;
     if (((pwm->PWMSTART | pwm->PWM_OE) & mask) != 0U ||
-        !sgll_pwm_period_set(pwm, channel, config->period_ticks, config->inactive_ticks))
+        !sg200x_ll_pwm_period_set(pwm, channel, config->period_ticks, config->inactive_ticks))
     {
         return false;
     }
-    sgll_pwm_polarity_set(pwm, mask, config->active_high);
-    sgll_csr_fence_io();
+    sg200x_ll_pwm_polarity_set(pwm, mask, config->active_high);
+    sg200x_ll_csr_fence_io();
     return true;
 }
 
-bool sgll_pwm_update(PWM_Type *pwm, uint32_t channels)
+bool sg200x_ll_pwm_update(PWM_Type *pwm, uint32_t channels)
 {
     if (!pwm_channels_valid(pwm, channels))
         return false;
-    sgll_csr_fence_io();
+    sg200x_ll_csr_fence_io();
     pwm->PWMUPDATE |= channels;
-    sgll_csr_fence_io();
+    sg200x_ll_csr_fence_io();
     pwm->PWMUPDATE &= ~channels;
-    sgll_csr_fence_io();
+    sg200x_ll_csr_fence_io();
     return true;
 }
 
-bool sgll_pwm_start(PWM_Type *pwm, uint32_t channels, bool active_high)
+bool sg200x_ll_pwm_start(PWM_Type *pwm, uint32_t channels, bool active_high)
 {
     if (!pwm_channels_valid(pwm, channels))
         return false;
-    sgll_pwm_polarity_set(pwm, channels, active_high);
+    sg200x_ll_pwm_polarity_set(pwm, channels, active_high);
     pwm->PWMSTART &= ~channels;
-    sgll_csr_fence_io();
+    sg200x_ll_csr_fence_io();
     pwm->PWM_OE |= channels;
-    sgll_csr_fence_io();
+    sg200x_ll_csr_fence_io();
     pwm->PWMSTART |= channels;
-    sgll_csr_fence_io();
+    sg200x_ll_csr_fence_io();
     return true;
 }
 
-bool sgll_pwm_stop(PWM_Type *pwm, uint32_t channels)
+bool sg200x_ll_pwm_stop(PWM_Type *pwm, uint32_t channels)
 {
     if (!pwm_channels_valid(pwm, channels))
         return false;
     pwm->PWM_OE &= ~channels;
-    sgll_csr_fence_io();
+    sg200x_ll_csr_fence_io();
     pwm->PWMSTART &= ~channels;
-    sgll_csr_fence_io();
+    sg200x_ll_csr_fence_io();
     return true;
 }

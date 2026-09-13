@@ -14,7 +14,7 @@
  * @pre cpu 必须为 0、1 或 2；该原语不报告无效 CPU 编号。
  *      cpu must be 0, 1, or 2; this primitive does not report invalid CPU indices.
  */
-static inline uint32_t sgll_dmamux_interrupt_route_get(uint32_t cpu)
+static inline uint32_t sg200x_ll_dmamux_interrupt_route_get(uint32_t cpu)
 {
     const uint32_t shift = cpu == 0U   ? TOP_DMA_INTERRUPT_CPU0_SHIFT
                            : cpu == 1U ? TOP_DMA_INTERRUPT_CPU1_SHIFT
@@ -34,7 +34,7 @@ static inline uint32_t sgll_dmamux_interrupt_route_get(uint32_t cpu)
  *       Other CPUs' fields are preserved; the selected field is replaced in full, so retain channels owned by
  *       other users.
  */
-static inline void sgll_dmamux_interrupt_route_set(uint32_t cpu, uint32_t channels)
+static inline void sg200x_ll_dmamux_interrupt_route_set(uint32_t cpu, uint32_t channels)
 {
     const uint32_t shift = cpu == 0U   ? TOP_DMA_INTERRUPT_CPU0_SHIFT
                            : cpu == 1U ? TOP_DMA_INTERRUPT_CPU1_SHIFT
@@ -51,7 +51,7 @@ static inline void sgll_dmamux_interrupt_route_set(uint32_t cpu, uint32_t channe
  * @param transmit 为 true 选择发送请求，否则选择接收请求 / True selects transmit; false selects receive.
  * @return 请求编号；无效实例返回 DMA_REQUEST_NONE / Request number; DMA_REQUEST_NONE for an invalid instance.
  */
-static inline uint32_t sgll_dmamux_spi_request_get(uint32_t index, bool transmit)
+static inline uint32_t sg200x_ll_dmamux_spi_request_get(uint32_t index, bool transmit)
 {
     switch (index)
     {
@@ -74,7 +74,7 @@ static inline uint32_t sgll_dmamux_spi_request_get(uint32_t index, bool transmit
  * @param transmit 为 true 选择发送请求，否则选择接收请求 / True selects transmit; false selects receive.
  * @return 请求编号；无效实例返回 DMA_REQUEST_NONE / Request number; DMA_REQUEST_NONE for an invalid instance.
  */
-static inline uint32_t sgll_dmamux_i2c_request_get(uint32_t index, bool transmit)
+static inline uint32_t sg200x_ll_dmamux_i2c_request_get(uint32_t index, bool transmit)
 {
     switch (index)
     {

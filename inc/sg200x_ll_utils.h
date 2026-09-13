@@ -8,7 +8,7 @@
  * @param n 零起始位号，必须小于 unsigned long 的位宽 / Zero-based bit index below the width of unsigned long.
  * @return 仅位 n 置位的掩码 / Mask with only bit n set.
  */
-#define SGLL_BIT(n) (1UL << (n))
+#define LL_BIT(n) (1UL << (n))
 /**
  * @brief 构造 32 位连续字段掩码 / Build a contiguous 32-bit field mask.
  *
@@ -16,7 +16,7 @@
  * @param width 字段位数，不大于 32 - shift / Field bit count, no greater than 32 - shift.
  * @return 指定字段的掩码 / Mask of the selected field.
  */
-#define SGLL_MASK(shift, width) ((uint32_t)((((uint64_t)1U << (width)) - 1U) << (shift)))
+#define LL_MASK(shift, width) ((uint32_t)((((uint64_t)1U << (width)) - 1U) << (shift)))
 
 /**
  * @brief 从 32 位数值中提取位字段 / Extract a bit field from a 32-bit value.
@@ -29,7 +29,7 @@
  *      shift must be below 32 and width no greater than 32 - shift; the caller validates ranges.
  * @note 仅进行数值运算，不读取或写入寄存器 / Perform value operations only; no registers are read or written.
  */
-static inline uint32_t sgll_field_get(uint32_t value, uint32_t shift, uint32_t width)
+static inline uint32_t sg200x_ll_field_get(uint32_t value, uint32_t shift, uint32_t width)
 {
     return (value >> shift) & (uint32_t)(((uint64_t)1U << width) - 1U);
 }
@@ -49,8 +49,8 @@ static inline uint32_t sgll_field_get(uint32_t value, uint32_t shift, uint32_t w
  *       High bits of field_value outside the field width are discarded.
  */
 static inline uint32_t
-sgll_field_prepare(uint32_t reg_value, uint32_t shift, uint32_t width, uint32_t field_value)
+sg200x_ll_field_prepare(uint32_t reg_value, uint32_t shift, uint32_t width, uint32_t field_value)
 {
-    const uint32_t mask = SGLL_MASK(shift, width);
+    const uint32_t mask = LL_MASK(shift, width);
     return (reg_value & ~mask) | ((field_value << shift) & mask);
 }

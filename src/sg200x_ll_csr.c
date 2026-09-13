@@ -36,34 +36,36 @@
  *       Bind a0 explicitly and retain the memory clobber so optimization and LTO cannot detach the operand;
  *       finish with sync.s.
  */
-#define DCACHE_OP_RANGE(OP, addr, size)                                            \
-    do                                                                             \
-    {                                                                              \
-        register uintptr_t line_ __asm__("a0") =                                   \
-            (uintptr_t)(addr) & ~(uintptr_t)(SGLL_DCACHE_LINE_SIZE - 1U);          \
-        const uintptr_t end_ =                                                     \
-            (((uintptr_t)(addr) + (size_t)(size) + (SGLL_DCACHE_LINE_SIZE - 1U)) & \
-             ~(uintptr_t)(SGLL_DCACHE_LINE_SIZE - 1U));                            \
-        for (; line_ < end_; line_ += SGLL_DCACHE_LINE_SIZE)                       \
-        {                                                                          \
-            __asm__ __volatile__(OP : : "r"(line_) : "memory");                    \
-        }                                                                          \
-        __asm__ __volatile__(SYNC_S ::: "memory");                                 \
+#define DCACHE_OP_RANGE(OP, addr, size)                                                                      \
+    do                                                                                                       \
+    {                                                                                                        \
+        register uintptr_t line_ __asm__("a0") = (uintptr_t)(addr) & ~(uintptr_t)(LL_DCACHE_LINE_SIZE - 1U); \
+        const uintptr_t end_ =                                                                               \
+            (((uintptr_t)(addr) + (size_t)(size) + (LL_DCACHE_LINE_SIZE - 1U)) &                             \
+             ~(uintptr_t)(LL_DCACHE_LINE_SIZE - 1U));                                                        \
+        for (; line_ < end_; line_ += LL_DCACHE_LINE_SIZE)                                                   \
+        {                                                                                                    \
+            __asm__ __volatile__(OP : : "r"(line_) : "memory");                                              \
+        }                                                                                                    \
+        __asm__ __volatile__(SYNC_S ::: "memory");                                                           \
     } while (0)
 
-void sgll_csr_dcache_invalidate_range(uintptr_t addr, size_t size)
+void sg200x_ll_csr_dcache_invalidate_range(uintptr_t addr, size_t size)
 {
     DCACHE_OP_RANGE(DCACHE_IPA_A0, addr, size);
 }
 
-void sgll_csr_dcache_clean_range(uintptr_t addr, size_t size) { DCACHE_OP_RANGE(DCACHE_CPA_A0, addr, size); }
+void sg200x_ll_csr_dcache_clean_range(uintptr_t addr, size_t size)
+{
+    DCACHE_OP_RANGE(DCACHE_CPA_A0, addr, size);
+}
 
-void sgll_csr_dcache_clean_invalidate_range(uintptr_t addr, size_t size)
+void sg200x_ll_csr_dcache_clean_invalidate_range(uintptr_t addr, size_t size)
 {
     DCACHE_OP_RANGE(DCACHE_CIPA_A0, addr, size);
 }
 
-void sgll_csr_delay_nops(uint32_t iterations)
+void sg200x_ll_csr_delay_nops(uint32_t iterations)
 {
     for (uint32_t count = 0U; count < iterations; ++count)
     {

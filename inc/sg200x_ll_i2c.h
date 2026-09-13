@@ -24,7 +24,7 @@ typedef struct
                            ///< through 63.
     uint32_t dma_rx_level; ///< 接收 DMA 请求阈值，范围为 0 到 63。 Receive DMA request threshold from 0
                            ///< through 63.
-} sgll_i2c_init_t;
+} sg200x_ll_i2c_init_t;
 
 /**
  * @brief I2C 寄存器时序计数 / I2C register timing counts.
@@ -38,7 +38,7 @@ typedef struct
     uint32_t sda_hold;      ///< SDA 发送保持计数。 SDA transmit-hold count.
     uint32_t sda_setup;     ///< SDA 建立计数。 SDA setup count.
     uint32_t spike_length;  ///< SCL 毛刺抑制计数。 SCL spike-suppression count.
-} sgll_i2c_timing_t;
+} sg200x_ll_i2c_timing_t;
 
 #ifdef __cplusplus
 extern "C"
@@ -53,7 +53,7 @@ extern "C"
      *       A null pointer is ignored. Defaults select standard mode, seven-bit addressing and restart, with
      *       zero FIFO/DMA thresholds.
      */
-    void sgll_i2c_struct_init(sgll_i2c_init_t *config);
+    void sg200x_ll_i2c_struct_init(sg200x_ll_i2c_init_t *config);
 
     /**
      * @brief 按 TRM 时序配置一个已停止的 I2C 主机 / Configure a stopped I2C master using TRM timing profiles.
@@ -70,7 +70,7 @@ extern "C"
      *       The caller manages clocks, pins, and DMA. The controller, interrupts, and DMA requests remain
      *       disabled on success.
      */
-    bool sgll_i2c_init(I2C_Type *i2c, const sgll_i2c_init_t *config, uint32_t peripheral_clock_hz);
+    bool sg200x_ll_i2c_init(I2C_Type *i2c, const sg200x_ll_i2c_init_t *config, uint32_t peripheral_clock_hz);
 
     /**
      * @brief 复位一个已停止的 I2C 实例 / Reset one stopped I2C instance.
@@ -81,7 +81,7 @@ extern "C"
      * @note 先停止相关 DMA 并确认禁用完成；仅脉冲此实例的复位位。
      *       Stop associated DMA and confirm disable completion first; only this instance's reset is pulsed.
      */
-    bool sgll_i2c_deinit(I2C_Type *i2c);
+    bool sg200x_ll_i2c_deinit(I2C_Type *i2c);
 #ifdef __cplusplus
 }
 #endif
@@ -92,7 +92,7 @@ extern "C"
  * @param index 实例编号，范围为 0 到 4 / Instance index from 0 through 4.
  * @return 实例指针；编号无效时返回空指针 / Instance pointer, or null for an invalid index.
  */
-static inline I2C_Type *sgll_i2c_get(uint32_t index)
+static inline I2C_Type *sg200x_ll_i2c_get(uint32_t index)
 {
     switch (index)
     {
@@ -122,7 +122,7 @@ static inline I2C_Type *sgll_i2c_get(uint32_t index)
  * @return 可写入 CON 的配置值 / Configuration value to write to CON.
  */
 static inline uint32_t
-sgll_i2c_con_build(bool master, uint32_t speed, bool master_10bit, bool restart, bool slave_disable)
+sg200x_ll_i2c_con_build(bool master, uint32_t speed, bool master_10bit, bool restart, bool slave_disable)
 {
     uint32_t value = (speed << I2C_CON_SPEED_SHIFT) & I2C_CON_SPEED_MASK;
     if (master)
@@ -143,7 +143,7 @@ sgll_i2c_con_build(bool master, uint32_t speed, bool master_10bit, bool restart,
  * @param value 要写入或编码的数值 / Value to write or encode.
  * @pre 修改 CON 前必须禁止控制器 / Disable the controller before modifying CON.
  */
-static inline void sgll_i2c_con_set(I2C_Type *i2c, uint32_t value) { i2c->CON = value; }
+static inline void sg200x_ll_i2c_con_set(I2C_Type *i2c, uint32_t value) { i2c->CON = value; }
 
 /**
  * @brief 设置 I2C 目标地址及 10 位地址选择位 / Set the I2C target address and ten-bit address selector.
@@ -157,7 +157,7 @@ static inline void sgll_i2c_con_set(I2C_Type *i2c, uint32_t value) { i2c->CON = 
  * @note 本函数只写 TAR；CON 的主机 10 位模式需要单独配置。
  *       This function writes TAR only; configure the CON master ten-bit mode separately.
  */
-static inline void sgll_i2c_target_set(I2C_Type *i2c, uint16_t address, bool ten_bit)
+static inline void sg200x_ll_i2c_target_set(I2C_Type *i2c, uint16_t address, bool ten_bit)
 {
     i2c->TAR = ((uint32_t)address & I2C_TAR_ADDRESS_MASK) | (ten_bit ? I2C_TAR_10BIT_BIT : 0U);
 }
@@ -173,7 +173,7 @@ static inline void sgll_i2c_target_set(I2C_Type *i2c, uint16_t address, bool ten
  * @return 包含数据、读请求、STOP 和 RESTART 位的命令。
  *         Command containing data, read-request, STOP, and RESTART bits.
  */
-static inline uint32_t sgll_i2c_data_command_build(uint8_t data, bool read, bool stop, bool restart)
+static inline uint32_t sg200x_ll_i2c_data_command_build(uint8_t data, bool read, bool stop, bool restart)
 {
     return ((uint32_t)data & I2C_DATA_CMD_DATA_MASK) | (read ? I2C_DATA_CMD_READ_BIT : 0U) |
            (stop ? I2C_DATA_CMD_STOP_BIT : 0U) | (restart ? I2C_DATA_CMD_RESTART_BIT : 0U);
@@ -186,7 +186,10 @@ static inline uint32_t sgll_i2c_data_command_build(uint8_t data, bool read, bool
  * @param command 由 DATA_CMD 构造器生成的命令字 / Command word produced by the DATA_CMD builder.
  * @pre 调用者确认发送 FIFO 有空间 / The caller must ensure that the transmit FIFO has space.
  */
-static inline void sgll_i2c_data_command_write(I2C_Type *i2c, uint32_t command) { i2c->DATA_CMD = command; }
+static inline void sg200x_ll_i2c_data_command_write(I2C_Type *i2c, uint32_t command)
+{
+    i2c->DATA_CMD = command;
+}
 
 /**
  * @brief 读取屏蔽前的 I2C 中断状态 / Read unmasked I2C interrupt status.
@@ -194,7 +197,10 @@ static inline void sgll_i2c_data_command_write(I2C_Type *i2c, uint32_t command) 
  * @param i2c I2C 寄存器实例 / I2C register instance.
  * @return RAW_INTR_STAT 的当前值 / Current RAW_INTR_STAT value.
  */
-static inline uint32_t sgll_i2c_raw_interrupt_status_get(const I2C_Type *i2c) { return i2c->RAW_INTR_STAT; }
+static inline uint32_t sg200x_ll_i2c_raw_interrupt_status_get(const I2C_Type *i2c)
+{
+    return i2c->RAW_INTR_STAT;
+}
 
 /**
  * @brief 读取屏蔽后的 I2C 中断状态 / Read masked I2C interrupt status.
@@ -202,7 +208,7 @@ static inline uint32_t sgll_i2c_raw_interrupt_status_get(const I2C_Type *i2c) { 
  * @param i2c I2C 寄存器实例 / I2C register instance.
  * @return INTR_STAT 的当前值 / Current INTR_STAT value.
  */
-static inline uint32_t sgll_i2c_interrupt_status_get(const I2C_Type *i2c) { return i2c->INTR_STAT; }
+static inline uint32_t sg200x_ll_i2c_interrupt_status_get(const I2C_Type *i2c) { return i2c->INTR_STAT; }
 
 /**
  * @brief 通过读 CLR_INTR 清除 I2C 中断 / Clear I2C interrupts by reading CLR_INTR.
@@ -210,7 +216,7 @@ static inline uint32_t sgll_i2c_interrupt_status_get(const I2C_Type *i2c) { retu
  * @param i2c I2C 寄存器实例 / I2C register instance.
  * @return 清除寄存器读回值 / Value read from the clear register.
  */
-static inline uint32_t sgll_i2c_interrupt_clear(I2C_Type *i2c) { return i2c->CLR_INTR; }
+static inline uint32_t sg200x_ll_i2c_interrupt_clear(I2C_Type *i2c) { return i2c->CLR_INTR; }
 
 /**
  * @brief 写入 I2C 中断使能掩码 / Write the I2C interrupt-enable mask.
@@ -218,7 +224,7 @@ static inline uint32_t sgll_i2c_interrupt_clear(I2C_Type *i2c) { return i2c->CLR
  * @param i2c I2C 寄存器实例 / I2C register instance.
  * @param mask 写入 INTR_MASK 的中断使能位掩码 / Interrupt-enable mask written to INTR_MASK.
  */
-static inline void sgll_i2c_interrupt_mask_set(I2C_Type *i2c, uint32_t mask) { i2c->INTR_MASK = mask; }
+static inline void sg200x_ll_i2c_interrupt_mask_set(I2C_Type *i2c, uint32_t mask) { i2c->INTR_MASK = mask; }
 
 /**
  * @brief 请求使能或禁止 I2C 控制器 / Request enable or disable of the I2C controller.
@@ -228,7 +234,10 @@ static inline void sgll_i2c_interrupt_mask_set(I2C_Type *i2c, uint32_t mask) { i
  * @note 禁止请求可能延迟完成；继续配置或复位前读取 ENABLE_STATUS 确认。
  *       Disable completion may be delayed; check ENABLE_STATUS before further configuration or reset.
  */
-static inline void sgll_i2c_enable(I2C_Type *i2c, bool enable) { i2c->ENABLE = enable ? I2C_ENABLE_BIT : 0U; }
+static inline void sg200x_ll_i2c_enable(I2C_Type *i2c, bool enable)
+{
+    i2c->ENABLE = enable ? I2C_ENABLE_BIT : 0U;
+}
 
 /**
  * @brief 读取 I2C 控制器的实际使能状态 / Read the I2C controller's actual enable state.
@@ -236,7 +245,7 @@ static inline void sgll_i2c_enable(I2C_Type *i2c, bool enable) { i2c->ENABLE = e
  * @param i2c I2C 寄存器实例 / I2C register instance.
  * @return ENABLE_STATUS 的使能位为 1 时返回 true / True when the enable bit in ENABLE_STATUS is set.
  */
-static inline bool sgll_i2c_is_enabled(const I2C_Type *i2c)
+static inline bool sg200x_ll_i2c_is_enabled(const I2C_Type *i2c)
 {
     return (i2c->ENABLE_STATUS & I2C_ENABLE_STATUS_BIT) != 0U;
 }
@@ -247,7 +256,7 @@ static inline bool sgll_i2c_is_enabled(const I2C_Type *i2c)
  * @param i2c I2C 寄存器实例 / I2C register instance.
  * @return TXFLR 中的条目数 / Entry count reported by TXFLR.
  */
-static inline uint32_t sgll_i2c_tx_fifo_level_get(const I2C_Type *i2c) { return i2c->TXFLR; }
+static inline uint32_t sg200x_ll_i2c_tx_fifo_level_get(const I2C_Type *i2c) { return i2c->TXFLR; }
 
 /**
  * @brief 读取 I2C 接收 FIFO 的条目数 / Read the number of entries in the I2C receive FIFO.
@@ -255,7 +264,7 @@ static inline uint32_t sgll_i2c_tx_fifo_level_get(const I2C_Type *i2c) { return 
  * @param i2c I2C 寄存器实例 / I2C register instance.
  * @return RXFLR 中的条目数 / Entry count reported by RXFLR.
  */
-static inline uint32_t sgll_i2c_rx_fifo_level_get(const I2C_Type *i2c) { return i2c->RXFLR; }
+static inline uint32_t sg200x_ll_i2c_rx_fifo_level_get(const I2C_Type *i2c) { return i2c->RXFLR; }
 
 /**
  * @brief 配置 I2C 的接收和发送 DMA 请求 / Configure I2C receive and transmit DMA requests.
@@ -266,7 +275,7 @@ static inline uint32_t sgll_i2c_rx_fifo_level_get(const I2C_Type *i2c) { return 
  * @note 仅修改外设请求位，不申请、配置或启动 DMA 通道。
  *       Only peripheral request bits change; DMA channels are not acquired, configured, or started.
  */
-static inline void sgll_i2c_dma_enable(I2C_Type *i2c, bool receive, bool transmit)
+static inline void sg200x_ll_i2c_dma_enable(I2C_Type *i2c, bool receive, bool transmit)
 {
     i2c->DMA_CR = (receive ? I2C_DMA_RX_ENABLE_BIT : 0U) | (transmit ? I2C_DMA_TX_ENABLE_BIT : 0U);
 }
@@ -278,7 +287,7 @@ static inline void sgll_i2c_dma_enable(I2C_Type *i2c, bool receive, bool transmi
  * @note 仅修改外设请求位，不申请、配置或启动 DMA 通道。
  *       Only peripheral request bits change; DMA channels are not acquired, configured, or started.
  */
-static inline void sgll_i2c_dma_disable(I2C_Type *i2c) { i2c->DMA_CR = 0U; }
+static inline void sg200x_ll_i2c_dma_disable(I2C_Type *i2c) { i2c->DMA_CR = 0U; }
 
 #ifdef __cplusplus
 extern "C"
@@ -296,7 +305,7 @@ extern "C"
      *        Rounds the device default nanosecond budgets upward and compensates DesignWare high/low latency;
      *        no hardware access.
      */
-    bool sgll_i2c_timing_calculate(uint32_t peripheral_clock_hz, sgll_i2c_timing_t *timing);
+    bool sg200x_ll_i2c_timing_calculate(uint32_t peripheral_clock_hz, sg200x_ll_i2c_timing_t *timing);
 
     /**
      * @brief 使用显式时序配置一个已停止的 I2C 主机 / Configure a stopped I2C master with explicit timing.
@@ -310,8 +319,9 @@ extern "C"
      *        Leaves the controller, interrupts, and DMA requests disabled and clears prior interrupts; the
      *        caller prepares clocks and pins.
      */
-    bool
-    sgll_i2c_init_with_timing(I2C_Type *i2c, const sgll_i2c_init_t *config, const sgll_i2c_timing_t *timing);
+    bool sg200x_ll_i2c_init_with_timing(
+        I2C_Type *i2c, const sg200x_ll_i2c_init_t *config, const sg200x_ll_i2c_timing_t *timing
+    );
 
     /**
      * @brief 请求 I2C 使能状态并有界等待确认 / Request an I2C enable state and wait for bounded confirmation.
@@ -324,7 +334,7 @@ extern "C"
      *        A valid instance receives the enable request even with zero attempts; timeout does not cancel
      *        the request.
      */
-    bool sgll_i2c_enable_wait(I2C_Type *i2c, bool enable, uint32_t attempts);
+    bool sg200x_ll_i2c_enable_wait(I2C_Type *i2c, bool enable, uint32_t attempts);
 
 #ifdef __cplusplus
 }
@@ -338,11 +348,11 @@ extern "C"
  * @pre 控制器已停止，地址符合七位或十位范围。
  *        The controller is stopped and the address fits seven or ten bits.
  */
-static inline void sgll_i2c_master_address_set(I2C_Type *i2c, uint16_t address, bool ten_bit)
+static inline void sg200x_ll_i2c_master_address_set(I2C_Type *i2c, uint16_t address, bool ten_bit)
 {
     const uint32_t con = i2c->CON;
     i2c->CON = ten_bit ? con | I2C_CON_MASTER_10BIT_BIT : con & ~I2C_CON_MASTER_10BIT_BIT;
-    sgll_i2c_target_set(i2c, address, ten_bit);
+    sg200x_ll_i2c_target_set(i2c, address, ten_bit);
 }
 
 /**
@@ -352,7 +362,7 @@ static inline void sgll_i2c_master_address_set(I2C_Type *i2c, uint16_t address, 
  * @param receive 接收阈值，小于 I2C_FIFO_DEPTH / Receive threshold, below I2C_FIFO_DEPTH.
  * @pre 控制器已停止且阈值有效 / The controller is stopped and thresholds are valid.
  */
-static inline void sgll_i2c_dma_threshold_set(I2C_Type *i2c, uint32_t transmit, uint32_t receive)
+static inline void sg200x_ll_i2c_dma_threshold_set(I2C_Type *i2c, uint32_t transmit, uint32_t receive)
 {
     i2c->DMA_TDLR = transmit;
     i2c->DMA_RDLR = receive;
@@ -364,7 +374,7 @@ static inline void sgll_i2c_dma_threshold_set(I2C_Type *i2c, uint32_t transmit, 
  * @return 清除寄存器读回值 / Clear-register readback value.
  * @note 读取即清除该状态 / Reading clears the corresponding status.
  */
-static inline uint32_t sgll_i2c_abort_clear(I2C_Type *i2c) { return i2c->CLR_TX_ABRT; }
+static inline uint32_t sg200x_ll_i2c_abort_clear(I2C_Type *i2c) { return i2c->CLR_TX_ABRT; }
 
 /**
  * @brief 清除 I2C STOP 检测状态 / Clear I2C STOP-detection status.
@@ -372,11 +382,11 @@ static inline uint32_t sgll_i2c_abort_clear(I2C_Type *i2c) { return i2c->CLR_TX_
  * @return 清除寄存器读回值 / Clear-register readback value.
  * @note 读取即清除该状态 / Reading clears the corresponding status.
  */
-static inline uint32_t sgll_i2c_stop_clear(I2C_Type *i2c) { return i2c->CLR_STOP_DET; }
+static inline uint32_t sg200x_ll_i2c_stop_clear(I2C_Type *i2c) { return i2c->CLR_STOP_DET; }
 
 /**
  * @brief 获取供 DMA 使用的 DATA_CMD 地址 / Get the DATA_CMD address for DMA.
  * @param i2c I2C0 至 I2C4 寄存器实例 / I2C0 through I2C4 register instance.
  * @return DATA_CMD 寄存器地址，不执行读取 / DATA_CMD register address; no read is performed.
  */
-static inline uintptr_t sgll_i2c_data_address(I2C_Type *i2c) { return (uintptr_t)&i2c->DATA_CMD; }
+static inline uintptr_t sg200x_ll_i2c_data_address(I2C_Type *i2c) { return (uintptr_t)&i2c->DATA_CMD; }

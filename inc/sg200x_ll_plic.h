@@ -15,7 +15,7 @@
  * @pre irq 必须是器件头定义的有效源编号且小于 NUM_IRQ；原语不检查边界。
  *      irq must be a valid device-defined source below NUM_IRQ; the primitive does not check bounds.
  */
-static inline void sgll_plic_irq_priority_set(uint32_t irq, uint32_t prio)
+static inline void sg200x_ll_plic_irq_priority_set(uint32_t irq, uint32_t prio)
 {
     PLIC_C906L->PRIORITY[irq] = prio;
 }
@@ -28,7 +28,7 @@ static inline void sgll_plic_irq_priority_set(uint32_t irq, uint32_t prio)
  * @pre irq 必须是器件头定义的有效源编号且小于 NUM_IRQ；原语不检查边界。
  *      irq must be a valid device-defined source below NUM_IRQ; the primitive does not check bounds.
  */
-static inline uint32_t sgll_plic_irq_priority_get(uint32_t irq) { return PLIC_C906L->PRIORITY[irq]; }
+static inline uint32_t sg200x_ll_plic_irq_priority_get(uint32_t irq) { return PLIC_C906L->PRIORITY[irq]; }
 
 /**
  * @brief 使能中断源到 C906L 上下文的路由 / Enable an interrupt source for the C906L context.
@@ -37,9 +37,9 @@ static inline uint32_t sgll_plic_irq_priority_get(uint32_t irq) { return PLIC_C9
  * @pre irq 必须是器件头定义的有效源编号且小于 NUM_IRQ；原语不检查边界。
  *      irq must be a valid device-defined source below NUM_IRQ; the primitive does not check bounds.
  */
-static inline void sgll_plic_irq_enable(uint32_t irq)
+static inline void sg200x_ll_plic_irq_enable(uint32_t irq)
 {
-    PLIC_C906L->ENABLE[irq / PLIC_IRQS_PER_WORD] |= SGLL_BIT(irq % PLIC_IRQS_PER_WORD);
+    PLIC_C906L->ENABLE[irq / PLIC_IRQS_PER_WORD] |= LL_BIT(irq % PLIC_IRQS_PER_WORD);
 }
 
 /**
@@ -49,9 +49,9 @@ static inline void sgll_plic_irq_enable(uint32_t irq)
  * @pre irq 必须是器件头定义的有效源编号且小于 NUM_IRQ；原语不检查边界。
  *      irq must be a valid device-defined source below NUM_IRQ; the primitive does not check bounds.
  */
-static inline void sgll_plic_irq_disable(uint32_t irq)
+static inline void sg200x_ll_plic_irq_disable(uint32_t irq)
 {
-    PLIC_C906L->ENABLE[irq / PLIC_IRQS_PER_WORD] &= ~(uint32_t)SGLL_BIT(irq % PLIC_IRQS_PER_WORD);
+    PLIC_C906L->ENABLE[irq / PLIC_IRQS_PER_WORD] &= ~(uint32_t)LL_BIT(irq % PLIC_IRQS_PER_WORD);
 }
 
 /**
@@ -62,9 +62,9 @@ static inline void sgll_plic_irq_disable(uint32_t irq)
  * @pre irq 必须是器件头定义的有效源编号且小于 NUM_IRQ；原语不检查边界。
  *      irq must be a valid device-defined source below NUM_IRQ; the primitive does not check bounds.
  */
-static inline bool sgll_plic_irq_is_enabled(uint32_t irq)
+static inline bool sg200x_ll_plic_irq_is_enabled(uint32_t irq)
 {
-    return (PLIC_C906L->ENABLE[irq / PLIC_IRQS_PER_WORD] & SGLL_BIT(irq % PLIC_IRQS_PER_WORD)) != 0U;
+    return (PLIC_C906L->ENABLE[irq / PLIC_IRQS_PER_WORD] & LL_BIT(irq % PLIC_IRQS_PER_WORD)) != 0U;
 }
 
 /**
@@ -75,9 +75,9 @@ static inline bool sgll_plic_irq_is_enabled(uint32_t irq)
  * @pre irq 必须是器件头定义的有效源编号且小于 NUM_IRQ；原语不检查边界。
  *      irq must be a valid device-defined source below NUM_IRQ; the primitive does not check bounds.
  */
-static inline bool sgll_plic_irq_is_pending(uint32_t irq)
+static inline bool sg200x_ll_plic_irq_is_pending(uint32_t irq)
 {
-    return (PLIC_C906L->PENDING[irq / PLIC_IRQS_PER_WORD] & SGLL_BIT(irq % PLIC_IRQS_PER_WORD)) != 0U;
+    return (PLIC_C906L->PENDING[irq / PLIC_IRQS_PER_WORD] & LL_BIT(irq % PLIC_IRQS_PER_WORD)) != 0U;
 }
 
 /**
@@ -86,14 +86,14 @@ static inline bool sgll_plic_irq_is_pending(uint32_t irq)
  * @param threshold 阈值 0 到 7；优先级不大于该值的源不会通知此上下文。
  *        Threshold from 0 through 7; sources at or below it do not signal this context.
  */
-static inline void sgll_plic_threshold_set(uint32_t threshold) { PLIC_C906L->THRESHOLD = threshold; }
+static inline void sg200x_ll_plic_threshold_set(uint32_t threshold) { PLIC_C906L->THRESHOLD = threshold; }
 
 /**
  * @brief 读取 C906L PLIC 上下文的优先级阈值 / Read the C906L PLIC context priority threshold.
  *
  * @return 当前阈值 / Current threshold.
  */
-static inline uint32_t sgll_plic_threshold_get(void) { return PLIC_C906L->THRESHOLD; }
+static inline uint32_t sg200x_ll_plic_threshold_get(void) { return PLIC_C906L->THRESHOLD; }
 
 /**
  * @brief 领取优先级最高的可处理中断源 / Claim the highest-priority eligible interrupt source.
@@ -102,14 +102,14 @@ static inline uint32_t sgll_plic_threshold_get(void) { return PLIC_C906L->THRESH
  * @note 读 CLAIM_COMPLETE 会把该源标记为服务中，完成后必须调用 irq_complete。
  *       Reading CLAIM_COMPLETE marks the source in service; call irq_complete after servicing it.
  */
-static inline uint32_t sgll_plic_irq_claim(void) { return PLIC_C906L->CLAIM_COMPLETE; }
+static inline uint32_t sg200x_ll_plic_irq_claim(void) { return PLIC_C906L->CLAIM_COMPLETE; }
 
 /**
  * @brief 提交一个已领取中断源的处理完成通知 / Complete service of a previously claimed interrupt source.
  *
  * @param irq 先前由 irq_claim 领取的非零中断源编号 / Nonzero source ID previously returned by irq_claim.
  */
-static inline void sgll_plic_irq_complete(uint32_t irq) { PLIC_C906L->CLAIM_COMPLETE = irq; }
+static inline void sg200x_ll_plic_irq_complete(uint32_t irq) { PLIC_C906L->CLAIM_COMPLETE = irq; }
 
 #if defined(__riscv)
 
@@ -119,7 +119,7 @@ static inline void sgll_plic_irq_complete(uint32_t irq) { PLIC_C906L->CLAIM_COMP
  * @note 只修改 mie.MEIE；全局中断状态和 PLIC 各源使能独立管理。
  *       Only mie.MEIE changes; global interrupt state and per-source PLIC enables are managed separately.
  */
-static inline void sgll_plic_core_enable(void) { sgll_csr_external_irq_enable(); }
+static inline void sg200x_ll_plic_core_enable(void) { sg200x_ll_csr_external_irq_enable(); }
 
 /**
  * @brief 禁止核心的 PLIC 外部中断输入 / Disable the core's PLIC external-interrupt input.
@@ -127,7 +127,7 @@ static inline void sgll_plic_core_enable(void) { sgll_csr_external_irq_enable();
  * @note 只修改 mie.MEIE；全局中断状态和 PLIC 各源使能独立管理。
  *       Only mie.MEIE changes; global interrupt state and per-source PLIC enables are managed separately.
  */
-static inline void sgll_plic_core_disable(void) { sgll_csr_external_irq_disable(); }
+static inline void sg200x_ll_plic_core_disable(void) { sg200x_ll_csr_external_irq_disable(); }
 
 #endif
 

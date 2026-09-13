@@ -14,7 +14,7 @@ static rstgen_reset_target_t i2c_reset_target(const I2C_Type *i2c)
         {RESET_I2C0, RESET_I2C1, RESET_I2C2, RESET_I2C3, RESET_I2C4};
     for (uint32_t index = 0U; index < I2C_COUNT; ++index)
     {
-        if (i2c == sgll_i2c_get(index))
+        if (i2c == sg200x_ll_i2c_get(index))
         {
             return resets[index];
         }
@@ -32,10 +32,10 @@ static rstgen_reset_target_t i2c_reset_target(const I2C_Type *i2c)
  */
 static bool i2c_is_disabled(const I2C_Type *i2c)
 {
-    return (i2c->ENABLE & (I2C_ENABLE_BIT | I2C_ENABLE_ABORT_BIT)) == 0U && !sgll_i2c_is_enabled(i2c);
+    return (i2c->ENABLE & (I2C_ENABLE_BIT | I2C_ENABLE_ABORT_BIT)) == 0U && !sg200x_ll_i2c_is_enabled(i2c);
 }
 
-void sgll_i2c_struct_init(sgll_i2c_init_t *config)
+void sg200x_ll_i2c_struct_init(sg200x_ll_i2c_init_t *config)
 {
     if (config == NULL)
     {
@@ -56,7 +56,7 @@ void sgll_i2c_struct_init(sgll_i2c_init_t *config)
  * @param timing 待检查的时序 / Timing to validate.
  * @return 所有字段均可表示时返回 true / True when all fields are representable.
  */
-static bool i2c_timing_valid(const sgll_i2c_timing_t *timing)
+static bool i2c_timing_valid(const sg200x_ll_i2c_timing_t *timing)
 {
     return timing != NULL && timing->standard_high != 0U && timing->standard_high <= I2C_SCL_COUNT_MAX &&
            timing->standard_low != 0U && timing->standard_low <= I2C_SCL_COUNT_MAX &&
@@ -78,11 +78,11 @@ static uint32_t i2c_cycles(uint32_t clock_hz, uint32_t nanoseconds)
     return (uint32_t)(((uint64_t)clock_hz * nanoseconds + 999999999ULL) / 1000000000ULL);
 }
 
-bool sgll_i2c_timing_calculate(uint32_t peripheral_clock_hz, sgll_i2c_timing_t *timing)
+bool sg200x_ll_i2c_timing_calculate(uint32_t peripheral_clock_hz, sg200x_ll_i2c_timing_t *timing)
 {
     if (timing == NULL || peripheral_clock_hz == 0U)
         return false;
-    sgll_i2c_timing_t counts = {
+    sg200x_ll_i2c_timing_t counts = {
         .standard_high = i2c_cycles(peripheral_clock_hz, I2C_STANDARD_HIGH_NS + I2C_SCL_FALL_NS),
         .standard_low = i2c_cycles(peripheral_clock_hz, I2C_STANDARD_LOW_NS + I2C_SCL_FALL_NS),
         .fast_high = i2c_cycles(peripheral_clock_hz, I2C_FAST_HIGH_NS + I2C_SCL_FALL_NS),
@@ -104,7 +104,9 @@ bool sgll_i2c_timing_calculate(uint32_t peripheral_clock_hz, sgll_i2c_timing_t *
     return true;
 }
 
-bool sgll_i2c_init_with_timing(I2C_Type *i2c, const sgll_i2c_init_t *config, const sgll_i2c_timing_t *timing)
+bool sg200x_ll_i2c_init_with_timing(
+    I2C_Type *i2c, const sg200x_ll_i2c_init_t *config, const sg200x_ll_i2c_timing_t *timing
+)
 {
     if (config == NULL || i2c_reset_target(i2c) == RESET_NONE || !i2c_timing_valid(timing) ||
         (config->speed != I2C_SPEED_STANDARD && config->speed != I2C_SPEED_FAST) ||
@@ -119,10 +121,11 @@ bool sgll_i2c_init_with_timing(I2C_Type *i2c, const sgll_i2c_init_t *config, con
     i2c->ENABLE = 0U;
     i2c->INTR_MASK = 0U;
     i2c->DMA_CR = 0U;
-    sgll_i2c_con_set(
-        i2c, sgll_i2c_con_build(true, config->speed, config->ten_bit_addressing, config->restart_enable, true)
+    sg200x_ll_i2c_con_set(
+        i2c,
+        sg200x_ll_i2c_con_build(true, config->speed, config->ten_bit_addressing, config->restart_enable, true)
     );
-    sgll_i2c_target_set(i2c, (uint16_t)config->target_address, config->ten_bit_addressing);
+    sg200x_ll_i2c_target_set(i2c, (uint16_t)config->target_address, config->ten_bit_addressing);
     i2c->SS_SCL_HCNT = timing->standard_high;
     i2c->SS_SCL_LCNT = timing->standard_low;
     i2c->FS_SCL_HCNT = timing->fast_high;
@@ -132,18 +135,18 @@ bool sgll_i2c_init_with_timing(I2C_Type *i2c, const sgll_i2c_init_t *config, con
     i2c->SPKLEN = timing->spike_length;
     i2c->TX_TL = config->tx_fifo_threshold;
     i2c->RX_TL = config->rx_fifo_threshold;
-    sgll_i2c_dma_threshold_set(i2c, config->dma_tx_level, config->dma_rx_level);
-    (void)sgll_i2c_interrupt_clear(i2c);
-    sgll_csr_fence_io();
+    sg200x_ll_i2c_dma_threshold_set(i2c, config->dma_tx_level, config->dma_rx_level);
+    (void)sg200x_ll_i2c_interrupt_clear(i2c);
+    sg200x_ll_csr_fence_io();
     return true;
 }
 
-bool sgll_i2c_init(I2C_Type *i2c, const sgll_i2c_init_t *config, uint32_t peripheral_clock_hz)
+bool sg200x_ll_i2c_init(I2C_Type *i2c, const sg200x_ll_i2c_init_t *config, uint32_t peripheral_clock_hz)
 {
     if (peripheral_clock_hz != I2C_TIMING_25M_CLOCK_HZ && peripheral_clock_hz != I2C_TIMING_100M_CLOCK_HZ)
         return false;
     const bool clock_25m = peripheral_clock_hz == I2C_TIMING_25M_CLOCK_HZ;
-    const sgll_i2c_timing_t timing = {
+    const sg200x_ll_i2c_timing_t timing = {
         .standard_high = clock_25m ? I2C_TIMING_25M_SS_HCNT : I2C_TIMING_100M_SS_HCNT,
         .standard_low = clock_25m ? I2C_TIMING_25M_SS_LCNT : I2C_TIMING_100M_SS_LCNT,
         .fast_high = clock_25m ? I2C_TIMING_25M_FS_HCNT : I2C_TIMING_100M_FS_HCNT,
@@ -152,24 +155,24 @@ bool sgll_i2c_init(I2C_Type *i2c, const sgll_i2c_init_t *config, uint32_t periph
         .sda_setup = clock_25m ? I2C_TIMING_25M_SDA_SETUP : I2C_TIMING_100M_SDA_SETUP,
         .spike_length = clock_25m ? I2C_TIMING_25M_SPKLEN : I2C_TIMING_100M_SPKLEN,
     };
-    return sgll_i2c_init_with_timing(i2c, config, &timing);
+    return sg200x_ll_i2c_init_with_timing(i2c, config, &timing);
 }
 
-bool sgll_i2c_enable_wait(I2C_Type *i2c, bool enable, uint32_t attempts)
+bool sg200x_ll_i2c_enable_wait(I2C_Type *i2c, bool enable, uint32_t attempts)
 {
     if (i2c_reset_target(i2c) == RESET_NONE)
         return false;
-    sgll_i2c_enable(i2c, enable);
-    sgll_csr_fence_io();
+    sg200x_ll_i2c_enable(i2c, enable);
+    sg200x_ll_csr_fence_io();
     for (uint32_t attempt = 0U; attempt < attempts; ++attempt)
     {
-        if (sgll_i2c_is_enabled(i2c) == enable)
+        if (sg200x_ll_i2c_is_enabled(i2c) == enable)
             return true;
     }
     return false;
 }
 
-bool sgll_i2c_deinit(I2C_Type *i2c)
+bool sg200x_ll_i2c_deinit(I2C_Type *i2c)
 {
     const rstgen_reset_target_t reset = i2c_reset_target(i2c);
     if (reset == RESET_NONE || !i2c_is_disabled(i2c))
@@ -178,10 +181,10 @@ bool sgll_i2c_deinit(I2C_Type *i2c)
     }
     i2c->INTR_MASK = 0U;
     i2c->DMA_CR = 0U;
-    sgll_csr_fence_io();
-    sgll_rcc_reset_assert(reset);
-    sgll_csr_fence_io();
-    sgll_rcc_reset_release(reset);
-    sgll_csr_fence_io();
+    sg200x_ll_csr_fence_io();
+    sg200x_ll_rcc_reset_assert(reset);
+    sg200x_ll_csr_fence_io();
+    sg200x_ll_rcc_reset_release(reset);
+    sg200x_ll_csr_fence_io();
     return true;
 }

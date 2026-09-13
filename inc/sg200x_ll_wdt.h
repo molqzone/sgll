@@ -13,14 +13,14 @@ typedef struct
         top; ///< 初始及重装超时编码 0 至 15。 Initial and reload timeout encoding from zero through fifteen.
     bool interrupt_first; ///< 第一次超时中断，第二次超时复位。 Interrupt on first timeout, reset on second
                           ///< timeout.
-} sgll_wdt_init_t;
+} sg200x_ll_wdt_init_t;
 
 /**
  * @brief 按编号获取主域看门狗 / Get a main-domain watchdog by index.
  * @param index 看门狗编号，0 至 2 / Watchdog index from zero through two.
  * @return 实例指针；无效编号返回空指针 / Instance pointer; null for an invalid index.
  */
-static inline WDT_Type *sgll_wdt_get(uint32_t index)
+static inline WDT_Type *sg200x_ll_wdt_get(uint32_t index)
 {
     switch (index)
     {
@@ -40,7 +40,10 @@ static inline WDT_Type *sgll_wdt_get(uint32_t index)
  * @param wdt 主域 WDT0 至 WDT2 寄存器实例 / Main-domain WDT0 through WDT2 register instance.
  * @return 已使能时为 true / True when enabled.
  */
-static inline bool sgll_wdt_is_enabled(const WDT_Type *wdt) { return (wdt->CR & WDT_CR_ENABLE_BIT) != 0U; }
+static inline bool sg200x_ll_wdt_is_enabled(const WDT_Type *wdt)
+{
+    return (wdt->CR & WDT_CR_ENABLE_BIT) != 0U;
+}
 
 /**
  * @brief 计算指数模式的超时周期数 / Calculate timeout cycles in exponential mode.
@@ -49,7 +52,7 @@ static inline bool sgll_wdt_is_enabled(const WDT_Type *wdt) { return (wdt->CR & 
  * @return 输入时钟周期数 / Input clock cycles.
  * @pre top 不超过 WDT_TOP_MAX / top does not exceed WDT_TOP_MAX.
  */
-static inline uint64_t sgll_wdt_timeout_cycles(uint32_t top)
+static inline uint64_t sg200x_ll_wdt_timeout_cycles(uint32_t top)
 {
     return 1ULL << (WDT_TIMEOUT_EXPONENT_MIN + top);
 }
@@ -62,7 +65,7 @@ static inline uint64_t sgll_wdt_timeout_cycles(uint32_t top)
  * @pre top 不超过 WDT_TOP_MAX / top does not exceed WDT_TOP_MAX.
  * @note 正在运行时的新周期在下次喂狗后生效 / A new running timeout takes effect after the next feed.
  */
-static inline void sgll_wdt_timeout_set(WDT_Type *wdt, uint32_t top)
+static inline void sg200x_ll_wdt_timeout_set(WDT_Type *wdt, uint32_t top)
 {
     wdt->TORR = top | (top << WDT_TOP_INITIAL_SHIFT);
 }
@@ -72,7 +75,7 @@ static inline void sgll_wdt_timeout_set(WDT_Type *wdt, uint32_t top)
  * @param wdt 主域 WDT0 至 WDT2 寄存器实例 / Main-domain WDT0 through WDT2 register instance.
  * @note 写入硬件规定的重启密钥 / Writes the hardware restart key.
  */
-static inline void sgll_wdt_feed(WDT_Type *wdt) { wdt->CRR = WDT_RESTART_KEY; }
+static inline void sg200x_ll_wdt_feed(WDT_Type *wdt) { wdt->CRR = WDT_RESTART_KEY; }
 
 #ifdef __cplusplus
 extern "C"
@@ -85,7 +88,7 @@ extern "C"
      * @note 默认最短超时编码和直接复位响应。
      *        Defaults select the shortest timeout encoding and immediate-reset response.
      */
-    void sgll_wdt_struct_init(sgll_wdt_init_t *config);
+    void sg200x_ll_wdt_struct_init(sg200x_ll_wdt_init_t *config);
 
     /**
      * @brief 配置一个尚未使能的看门狗 / Configure a watchdog that has not been enabled.
@@ -96,7 +99,7 @@ extern "C"
      * @note 写入指数计数模式及响应模式，完成后保持未使能。
      *        Programs exponential counting and response mode, leaving the watchdog disabled.
      */
-    bool sgll_wdt_init(WDT_Type *wdt, const sgll_wdt_init_t *config);
+    bool sg200x_ll_wdt_init(WDT_Type *wdt, const sg200x_ll_wdt_init_t *config);
 
     /**
      * @brief 重载并启动一个尚未使能的看门狗 / Reload and start a watchdog that has not been enabled.
@@ -111,7 +114,7 @@ extern "C"
      * @note 依次设置超时、喂狗、使能；一旦启动不能通过清 CR 停止。
      *        Orders timeout selection, feed, and enable; clearing CR cannot stop it after starting.
      */
-    bool sgll_wdt_start(WDT_Type *wdt, uint32_t top, bool interrupt_first);
+    bool sg200x_ll_wdt_start(WDT_Type *wdt, uint32_t top, bool interrupt_first);
 
     /**
      * @brief 为一个看门狗选择 CPU 或系统复位路由 / Select CPU or system reset routing for one watchdog.
@@ -124,7 +127,7 @@ extern "C"
      *        Preserves other instance routes and the shared clock field, retaining the Sophgo system-control
      *        compatibility enable.
      */
-    bool sgll_wdt_reset_route_set(uint32_t index, bool reset_cpu);
+    bool sg200x_ll_wdt_reset_route_set(uint32_t index, bool reset_cpu);
 
 #ifdef __cplusplus
 }

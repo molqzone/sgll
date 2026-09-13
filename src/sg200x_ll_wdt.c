@@ -11,7 +11,7 @@ static bool wdt_instance_valid(const WDT_Type *wdt)
     return wdt == WDT0_REGS || wdt == WDT1_REGS || wdt == WDT2_REGS;
 }
 
-void sgll_wdt_struct_init(sgll_wdt_init_t *config)
+void sg200x_ll_wdt_struct_init(sg200x_ll_wdt_init_t *config)
 {
     if (config != NULL)
     {
@@ -20,30 +20,31 @@ void sgll_wdt_struct_init(sgll_wdt_init_t *config)
     }
 }
 
-bool sgll_wdt_init(WDT_Type *wdt, const sgll_wdt_init_t *config)
+bool sg200x_ll_wdt_init(WDT_Type *wdt, const sg200x_ll_wdt_init_t *config)
 {
-    if (!wdt_instance_valid(wdt) || config == NULL || config->top > WDT_TOP_MAX || sgll_wdt_is_enabled(wdt))
+    if (!wdt_instance_valid(wdt) || config == NULL || config->top > WDT_TOP_MAX ||
+        sg200x_ll_wdt_is_enabled(wdt))
         return false;
-    sgll_wdt_timeout_set(wdt, config->top);
+    sg200x_ll_wdt_timeout_set(wdt, config->top);
     wdt->TOC = 0U;
     wdt->CR = config->interrupt_first ? WDT_CR_INTERRUPT_RESPONSE_BIT : 0U;
-    sgll_csr_fence_io();
+    sg200x_ll_csr_fence_io();
     return true;
 }
 
-bool sgll_wdt_start(WDT_Type *wdt, uint32_t top, bool interrupt_first)
+bool sg200x_ll_wdt_start(WDT_Type *wdt, uint32_t top, bool interrupt_first)
 {
-    if (!wdt_instance_valid(wdt) || top > WDT_TOP_MAX || sgll_wdt_is_enabled(wdt))
+    if (!wdt_instance_valid(wdt) || top > WDT_TOP_MAX || sg200x_ll_wdt_is_enabled(wdt))
         return false;
-    sgll_wdt_timeout_set(wdt, top);
-    sgll_wdt_feed(wdt);
-    sgll_csr_fence_io();
+    sg200x_ll_wdt_timeout_set(wdt, top);
+    sg200x_ll_wdt_feed(wdt);
+    sg200x_ll_csr_fence_io();
     wdt->CR = WDT_CR_ENABLE_BIT | (interrupt_first ? WDT_CR_INTERRUPT_RESPONSE_BIT : 0U);
-    sgll_csr_fence_io();
+    sg200x_ll_csr_fence_io();
     return true;
 }
 
-bool sgll_wdt_reset_route_set(uint32_t index, bool reset_cpu)
+bool sg200x_ll_wdt_reset_route_set(uint32_t index, bool reset_cpu)
 {
     if (index >= WDT_COUNT)
         return false;
@@ -51,6 +52,6 @@ bool sgll_wdt_reset_route_set(uint32_t index, bool reset_cpu)
     const uint32_t system_bit = 1U << (TOP_WDT_SYSTEM_ROUTE_SHIFT + index);
     const uint32_t cpu_bit = 1U << (TOP_WDT_CPU_ROUTE_SHIFT + index);
     TOP->WDT_CTRL = (TOP->WDT_CTRL & ~(system_bit | cpu_bit)) | (reset_cpu ? cpu_bit : system_bit);
-    sgll_csr_fence_io();
+    sg200x_ll_csr_fence_io();
     return true;
 }
