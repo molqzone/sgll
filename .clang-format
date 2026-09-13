@@ -1,4 +1,3 @@
-Language: C
 BasedOnStyle: LLVM
 IndentWidth: 4
 TabWidth: 4
@@ -8,3 +7,10 @@ ColumnLimit: 110
 AllowShortIfStatementsOnASingleLine: false
 AlignAfterOpenBracket: BlockIndent
 AlwaysBreakTemplateDeclarations: Yes
+
+AlignTrailingComments: true
+ReflowComments: false
+AlignEscapedNewlines: Left
+AlignConsecutiveMacros: false
+AllowAllArgumentsOnNextLine: true
+PenaltyBreakBeforeFirstCallParameter: 100
