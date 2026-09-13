@@ -1,22 +1,3 @@
-/**
- * @file sg200x_ll_dma.h
- * @brief SG2002 DesignWare AXI DMA 寄存器与描述符操作。
- *        SG2002 DesignWare AXI DMA register and descriptor operations.
- * @ingroup SGLL_DMA
- *
- * @note 调用者提供通道、描述符和中断掩码；本层不管理分配策略、回调、通道所有权或缓存策略。
- *       The caller supplies channels, descriptors, and interrupt masks; this layer does not manage allocation
- * policy, callbacks, ownership, or cache policy.
- * @note 多核共享通道以及寄存器读改写须由上层协调。
- *       Upper layers coordinate shared channels and register read-modify-write operations.
- * @see SG2002 技术参考手册 v1.02，第 11 章。SG2002 TRM v1.02, Chapter 11.
- */
-
-/**
- * @defgroup SGLL_DMA DMA 通道与描述符 / DMA channels and descriptors
- * @ingroup SGLL
- */
-
 #pragma once
 
 #include <stdbool.h>
@@ -27,9 +8,7 @@
 #include "sg200x_ll_utils.h"
 
 /**
- * @brief DMA 元素宽度编码。
- *        DMA item-width encoding.
- * @ingroup SGLL_DMA
+ * @brief DMA 元素宽度编码 / DMA item-width encoding.
  */
 typedef enum
 {
@@ -38,9 +17,7 @@ typedef enum
 } sgll_dma_width_t;
 
 /**
- * @brief DMA 数据传输方向。
- *        DMA data-transfer direction.
- * @ingroup SGLL_DMA
+ * @brief DMA 数据传输方向 / DMA data-transfer direction.
  */
 typedef enum
 {
@@ -50,9 +27,7 @@ typedef enum
 } sgll_dma_direction_t;
 
 /**
- * @brief DMA 普通或循环工作模式。
- *        DMA normal or circular operating mode.
- * @ingroup SGLL_DMA
+ * @brief DMA 普通或循环工作模式 / DMA normal or circular operating mode.
  */
 typedef enum
 {
@@ -61,9 +36,7 @@ typedef enum
 } sgll_dma_mode_t;
 
 /**
- * @brief DMA 外设请求映射编号。
- *        DMA peripheral-request mapping IDs.
- * @ingroup SGLL_DMA
+ * @brief DMA 外设请求映射编号 / DMA peripheral-request mapping IDs.
  */
 typedef enum
 {
@@ -109,9 +82,7 @@ typedef enum
 } sgll_dma_request_t;
 
 /**
- * @brief 调用者持有的 DMA 初始化参数。
- *        Caller-owned DMA initialization parameters.
- * @ingroup SGLL_DMA
+ * @brief 调用者持有的 DMA 初始化参数 / Caller-owned DMA initialization parameters.
  */
 typedef struct
 {
@@ -123,21 +94,17 @@ typedef struct
     sgll_dma_width_t width;         ///< 字节或半字元素宽度。 Byte or half-word item width.
     sgll_dma_mode_t mode;           ///< 普通或循环模式。 Normal or circular mode.
     sgll_dma_request_t
-        request;       ///< 外设请求编号，内存复制使用 NONE。 Peripheral request ID; memory copy uses NONE.
+        request; ///< 外设请求编号，内存复制使用 NONE。 Peripheral request ID; memory copy uses NONE.
     uint32_t priority; ///< 通道优先级，范围为 0 到 7。 Channel priority from 0 through 7.
-    uintptr_t next;    ///< 循环模式下 0 表示自链接，否则是 64 字节对齐的下一项地址。 In circular mode, zero
-                       ///< self-links; otherwise use a 64-byte-aligned next-item address.
+    uintptr_t next; ///< 循环模式下 0 表示自链接，否则是 64 字节对齐的下一项地址。 In circular mode, zero
+        ///< self-links; otherwise use a 64-byte-aligned next-item address.
 } sgll_dma_init_t;
 
 /**
- * @brief 获取 DMA 通道的寄存器块。
- *        Get a DMA channel's register block.
- * @ingroup SGLL_DMA
+ * @brief 获取 DMA 通道的寄存器块 / Get a DMA channel's register block.
  *
- * @param channel DMA 通道编号，范围为 0 到 7。
- *        DMA channel index from 0 through 7.
- * @return 有效通道指针；编号无效时返回空指针。
- *         Channel pointer, or null for an invalid index.
+ * @param channel DMA 通道编号，范围为 0 到 7 / DMA channel index from 0 through 7.
+ * @return 有效通道指针；编号无效时返回空指针 / Channel pointer, or null for an invalid index.
  */
 static inline DMA_Channel_Type *sgll_dma_channel_get(uint32_t channel)
 {
@@ -145,14 +112,10 @@ static inline DMA_Channel_Type *sgll_dma_channel_get(uint32_t channel)
 }
 
 /**
- * @brief 获取 DMA 通道寄存器块的地址。
- *        Get the address of a DMA channel's register block.
- * @ingroup SGLL_DMA
+ * @brief 获取 DMA 通道寄存器块的地址 / Get the address of a DMA channel's register block.
  *
- * @param channel DMA 通道编号，范围为 0 到 7。
- *        DMA channel index from 0 through 7.
- * @return 寄存器块地址；编号无效时返回 0。
- *         Register-block address, or zero for an invalid index.
+ * @param channel DMA 通道编号，范围为 0 到 7 / DMA channel index from 0 through 7.
+ * @return 寄存器块地址；编号无效时返回 0 / Register-block address, or zero for an invalid index.
  */
 static inline uintptr_t sgll_dma_channel_address(uint32_t channel)
 {
@@ -160,26 +123,18 @@ static inline uintptr_t sgll_dma_channel_address(uint32_t channel)
 }
 
 /**
- * @brief 检查 DMA 通道编号。
- *        Check a DMA channel index.
- * @ingroup SGLL_DMA
+ * @brief 检查 DMA 通道编号 / Check a DMA channel index.
  *
- * @param channel DMA 通道编号，范围为 0 到 7。
- *        DMA channel index from 0 through 7.
- * @return 编号在 0 到 7 之间时为 true。
- *         True for channel indices from 0 through 7.
+ * @param channel DMA 通道编号，范围为 0 到 7 / DMA channel index from 0 through 7.
+ * @return 编号在 0 到 7 之间时为 true / True for channel indices from 0 through 7.
  */
 static inline bool sgll_dma_channel_is_valid(uint32_t channel) { return channel < DMA_CHANNEL_COUNT; }
 
 /**
- * @brief 设置 DMA 控制器及全局中断使能。
- *        Set DMA controller and global interrupt enables.
- * @ingroup SGLL_DMA
+ * @brief 设置 DMA 控制器及全局中断使能 / Set DMA controller and global interrupt enables.
  *
- * @param enable 为 true 时使能，为 false 时禁止。
- *        True to enable; false to disable.
- * @param enable_interrupts DMA 全局中断使能状态。
- *        DMA global interrupt-enable state.
+ * @param enable 为 true 时使能，为 false 时禁止 / True to enable; false to disable.
+ * @param enable_interrupts DMA 全局中断使能状态 / DMA global interrupt-enable state.
  */
 static inline void sgll_dma_enable(bool enable, bool enable_interrupts)
 {
@@ -188,22 +143,16 @@ static inline void sgll_dma_enable(bool enable, bool enable_interrupts)
 }
 
 /**
- * @brief 读取 DMA 通道使能寄存器。
- *        Read the DMA channel-enable register.
- * @ingroup SGLL_DMA
+ * @brief 读取 DMA 通道使能寄存器 / Read the DMA channel-enable register.
  *
- * @return CHEN 原始值，低 8 位表示通道使能状态。
- *         Raw CHEN value; the low eight bits report channel enables.
+ * @return CHEN 原始值，低 8 位表示通道使能状态 / Raw CHEN value; the low eight bits report channel enables.
  */
 static inline uint32_t sgll_dma_enabled_channels_get(void) { return DMA->GLOBAL.CHEN; }
 
 /**
- * @brief 请求停止一个 DMA 通道。
- *        Request that one DMA channel be disabled.
- * @ingroup SGLL_DMA
+ * @brief 请求停止一个 DMA 通道 / Request that one DMA channel be disabled.
  *
- * @param channel DMA 通道编号，范围为 0 到 7。
- *        DMA channel index from 0 through 7.
+ * @param channel DMA 通道编号，范围为 0 到 7 / DMA channel index from 0 through 7.
  * @note 此函数只发出请求；复用资源前须等待通道停止。
  *       This function only issues a request; wait for disable completion before reusing resources.
  */
@@ -216,12 +165,9 @@ static inline void sgll_dma_channel_disable_request(uint32_t channel)
 }
 
 /**
- * @brief 请求停止掩码指定的 DMA 通道。
- *        Request that the selected DMA channels be disabled.
- * @ingroup SGLL_DMA
+ * @brief 请求停止掩码指定的 DMA 通道 / Request that the selected DMA channels be disabled.
  *
- * @param channels DMA 通道位掩码，使用低 8 位。
- *        DMA channel mask using the low eight bits.
+ * @param channels DMA 通道位掩码，使用低 8 位 / DMA channel mask using the low eight bits.
  * @note 此函数只发出请求；复用资源前须等待通道停止。
  *       This function only issues a request; wait for disable completion before reusing resources.
  * @note 掩码仅可包含低 8 位，调用者负责共享通道所有权。
@@ -233,12 +179,9 @@ static inline void sgll_dma_channels_disable_request(uint32_t channels)
 }
 
 /**
- * @brief 使能一个已配置的 DMA 通道。
- *        Enable one configured DMA channel.
- * @ingroup SGLL_DMA
+ * @brief 使能一个已配置的 DMA 通道 / Enable one configured DMA channel.
  *
- * @param channel DMA 通道编号，范围为 0 到 7。
- *        DMA channel index from 0 through 7.
+ * @param channel DMA 通道编号，范围为 0 到 7 / DMA channel index from 0 through 7.
  */
 static inline void sgll_dma_channel_enable(uint32_t channel)
 {
@@ -249,12 +192,9 @@ static inline void sgll_dma_channel_enable(uint32_t channel)
 }
 
 /**
- * @brief 请求中止一个 DMA 通道。
- *        Request that one DMA channel be aborted.
- * @ingroup SGLL_DMA
+ * @brief 请求中止一个 DMA 通道 / Request that one DMA channel be aborted.
  *
- * @param channel DMA 通道编号，范围为 0 到 7。
- *        DMA channel index from 0 through 7.
+ * @param channel DMA 通道编号，范围为 0 到 7 / DMA channel index from 0 through 7.
  * @note 此函数只发出请求；复用资源前须等待通道停止。
  *       This function only issues a request; wait for disable completion before reusing resources.
  */
@@ -267,12 +207,9 @@ static inline void sgll_dma_channel_abort(uint32_t channel)
 }
 
 /**
- * @brief 请求中止掩码指定的 DMA 通道。
- *        Request that the selected DMA channels be aborted.
- * @ingroup SGLL_DMA
+ * @brief 请求中止掩码指定的 DMA 通道 / Request that the selected DMA channels be aborted.
  *
- * @param channels DMA 通道位掩码，使用低 8 位。
- *        DMA channel mask using the low eight bits.
+ * @param channels DMA 通道位掩码，使用低 8 位 / DMA channel mask using the low eight bits.
  * @note 此函数只发出请求；复用资源前须等待通道停止。
  *       This function only issues a request; wait for disable completion before reusing resources.
  * @note 掩码仅可包含低 8 位，调用者负责共享通道所有权。
@@ -284,14 +221,10 @@ static inline void sgll_dma_channels_abort(uint32_t channels)
 }
 
 /**
- * @brief 获取通道所使用的请求重映射寄存器。
- *        Get the request-remap register containing a channel's field.
- * @ingroup SGLL_DMA
+ * @brief 获取通道所使用的请求重映射寄存器 / Get the request-remap register containing a channel's field.
  *
- * @param channel DMA 通道编号，范围为 0 到 7。
- *        DMA channel index from 0 through 7.
- * @return TOP DMA_REMAP0 或 DMA_REMAP1 的地址。
- *         Address of TOP DMA_REMAP0 or DMA_REMAP1.
+ * @param channel DMA 通道编号，范围为 0 到 7 / DMA channel index from 0 through 7.
+ * @return TOP DMA_REMAP0 或 DMA_REMAP1 的地址 / Address of TOP DMA_REMAP0 or DMA_REMAP1.
  * @pre channel 必须在 0 到 7 之间；此辅助函数不检查范围。
  *      channel must be from 0 through 7; this helper does not check bounds.
  */
@@ -303,15 +236,12 @@ static inline volatile uint32_t *sgll_dma_remap_reg(uint32_t channel)
 /**
  * @brief 设置通道的外设请求映射并置位映射使能。
  *        Set a channel's peripheral-request mapping and enable remapping.
- * @ingroup SGLL_DMA
  *
- * @param channel DMA 通道编号，范围为 0 到 7。
- *        DMA channel index from 0 through 7.
- * @param request 外设 DMA 请求编号。
- *        Peripheral DMA request number.
+ * @param channel DMA 通道编号，范围为 0 到 7 / DMA channel index from 0 through 7.
+ * @param request 外设 DMA 请求编号 / Peripheral DMA request number.
  * @note 通道无效或 request 超出 6 位字段时不写寄存器；有效输入会执行读改写。
  *       Invalid channels or requests exceeding the six-bit field cause no write; valid inputs use
- * read-modify-write.
+ *       read-modify-write.
  */
 static inline void sgll_dma_request_route_set(uint32_t channel, uint32_t request)
 {
@@ -327,14 +257,10 @@ static inline void sgll_dma_request_route_set(uint32_t channel, uint32_t request
 }
 
 /**
- * @brief 读取通道的外设请求映射。
- *        Read a channel's peripheral-request mapping.
- * @ingroup SGLL_DMA
+ * @brief 读取通道的外设请求映射 / Read a channel's peripheral-request mapping.
  *
- * @param channel DMA 通道编号，范围为 0 到 7。
- *        DMA channel index from 0 through 7.
- * @return 请求编号；通道无效时返回 0。
- *         Request number, or zero for an invalid channel.
+ * @param channel DMA 通道编号，范围为 0 到 7 / DMA channel index from 0 through 7.
+ * @return 请求编号；通道无效时返回 0 / Request number, or zero for an invalid channel.
  */
 static inline uint32_t sgll_dma_request_route_get(uint32_t channel)
 {
@@ -348,12 +274,9 @@ static inline uint32_t sgll_dma_request_route_get(uint32_t channel)
 }
 
 /**
- * @brief 清除指定的 DMA 通道中断状态。
- *        Clear selected DMA channel interrupt status bits.
- * @ingroup SGLL_DMA
+ * @brief 清除指定的 DMA 通道中断状态 / Clear selected DMA channel interrupt status bits.
  *
- * @param channel DMA 通道编号，范围为 0 到 7。
- *        DMA channel index from 0 through 7.
+ * @param channel DMA 通道编号，范围为 0 到 7 / DMA channel index from 0 through 7.
  * @param status 写入 INTCLEAR 的清除位掩码，置 1 清除对应状态。
  *        Mask written to INTCLEAR; each set bit clears its status.
  */
@@ -367,14 +290,10 @@ static inline void sgll_dma_channel_interrupt_clear(uint32_t channel, uint32_t s
 }
 
 /**
- * @brief 读取 DMA 通道中断状态。
- *        Read DMA channel interrupt status.
- * @ingroup SGLL_DMA
+ * @brief 读取 DMA 通道中断状态 / Read DMA channel interrupt status.
  *
- * @param channel DMA 通道编号，范围为 0 到 7。
- *        DMA channel index from 0 through 7.
- * @return INTSTATUS 值；通道无效时返回 0。
- *         INTSTATUS value, or zero for an invalid channel.
+ * @param channel DMA 通道编号，范围为 0 到 7 / DMA channel index from 0 through 7.
+ * @return INTSTATUS 值；通道无效时返回 0 / INTSTATUS value, or zero for an invalid channel.
  */
 static inline uint32_t sgll_dma_channel_interrupt_status_get(uint32_t channel)
 {
@@ -385,10 +304,8 @@ static inline uint32_t sgll_dma_channel_interrupt_status_get(uint32_t channel)
 /**
  * @brief 同时配置中断状态锁存和中断信号使能。
  *        Configure interrupt-status latching and interrupt-signal enables together.
- * @ingroup SGLL_DMA
  *
- * @param channel DMA 通道编号，范围为 0 到 7。
- *        DMA channel index from 0 through 7.
+ * @param channel DMA 通道编号，范围为 0 到 7 / DMA channel index from 0 through 7.
  * @param mask 同时写入 INTSTATUS_EN 和 INTSIGNAL_EN 的使能掩码。
  *        Enable mask written to both INTSTATUS_EN and INTSIGNAL_EN.
  */
@@ -403,25 +320,19 @@ static inline void sgll_dma_channel_interrupt_configure(uint32_t channel, uint32
 }
 
 /**
- * @brief 编码 DMA 描述符的 64 位 CTL 字段。
- *        Encode the 64-bit CTL field of a DMA descriptor.
- * @ingroup SGLL_DMA
+ * @brief 编码 DMA 描述符的 64 位 CTL 字段 / Encode the 64-bit CTL field of a DMA descriptor.
  *
- * @param direction DMA 传输方向。
- *        DMA transfer direction.
- * @param width DMA 元素宽度，字节或半字。
- *        DMA item width: byte or half-word.
- * @param mode 普通或循环传输模式。
- *        Normal or circular transfer mode.
+ * @param direction DMA 传输方向 / DMA transfer direction.
+ * @param width DMA 元素宽度，字节或半字 / DMA item width: byte or half-word.
+ * @param mode 普通或循环传输模式 / Normal or circular transfer mode.
  * @param lli_address 保留的描述符地址参数，当前不参与 CTL 编码。
  *        Reserved descriptor-address argument; it does not currently affect CTL encoding.
- * @return CTL 编码，不访问硬件。
- *         CTL encoding without hardware access.
+ * @return CTL 编码，不访问硬件 / CTL encoding without hardware access.
  * @note 普通模式设置 LAST 和 VALID；循环模式只设置 VALID。
  *       Normal mode sets LAST and VALID; circular mode sets VALID only.
  * @note 此编码辅助函数假定枚举和通道参数有效；不负责资源分配或缓存同步。
  *       This encoding helper assumes valid enums and channel arguments; it does not allocate resources or
- * synchronize caches.
+ *       synchronize caches.
  */
 static inline uint64_t sgll_dma_control_build(
     sgll_dma_direction_t direction, sgll_dma_width_t width, sgll_dma_mode_t mode, uintptr_t lli_address
@@ -451,22 +362,17 @@ static inline uint64_t sgll_dma_control_build(
 }
 
 /**
- * @brief 编码 DMA 通道的 64 位 CFG 字段。
- *        Encode a DMA channel's 64-bit CFG field.
- * @ingroup SGLL_DMA
+ * @brief 编码 DMA 通道的 64 位 CFG 字段 / Encode a DMA channel's 64-bit CFG field.
  *
- * @param direction DMA 传输方向。
- *        DMA transfer direction.
- * @param channel DMA 通道编号，范围为 0 到 7。
- *        DMA channel index from 0 through 7.
- * @return CFG 编码，不访问硬件。
- *         CFG encoding without hardware access.
+ * @param direction DMA 传输方向 / DMA transfer direction.
+ * @param channel DMA 通道编号，范围为 0 到 7 / DMA channel index from 0 through 7.
+ * @return CFG 编码，不访问硬件 / CFG encoding without hardware access.
  * @note 默认最高优先级和最大未完成请求数；外设握手选择使用通道编号。
  *       Use maximum priority and outstanding-request settings; peripheral handshakes select the channel
- * index.
+ *       index.
  * @note 此编码辅助函数假定枚举和通道参数有效；不负责资源分配或缓存同步。
  *       This encoding helper assumes valid enums and channel arguments; it does not allocate resources or
- * synchronize caches.
+ *       synchronize caches.
  */
 static inline uint64_t sgll_dma_config_build(sgll_dma_direction_t direction, uint32_t channel)
 {
@@ -493,12 +399,9 @@ static inline uint64_t sgll_dma_config_build(sgll_dma_direction_t direction, uin
 /**
  * @brief 检查描述符地址是否非零且按 64 字节对齐。
  *        Check that a descriptor address is nonzero and 64-byte aligned.
- * @ingroup SGLL_DMA
  *
- * @param address 待检查或配置的地址。
- *        Address to check or configure.
- * @return 地址满足描述符对齐约束时为 true。
- *         True when the address meets descriptor-alignment requirements.
+ * @param address 待检查或配置的地址 / Address to check or configure.
+ * @return 地址满足描述符对齐约束时为 true / True when the address meets descriptor-alignment requirements.
  */
 static inline bool sgll_dma_lli_address_is_valid(uintptr_t address)
 {
@@ -511,85 +414,71 @@ extern "C"
 #endif
 
     /**
-     * @brief 填充 DMA 默认初始化参数。
-     *        Fill default DMA initialization parameters.
-     * @ingroup SGLL_DMA
+     * @brief 填充 DMA 默认初始化参数 / Fill default DMA initialization parameters.
      *
      * @param[out] config 接收默认配置的结构体指针，可为空。
      *        Destination for default configuration; may be null.
      * @note 默认按字节执行普通内存复制，优先级为 0；调用者仍需填写地址和数量。空指针不执行操作。
      *       Defaults are byte-wide normal memory copy at priority zero; supply addresses and a count. A null
-     * pointer is ignored.
+     *       pointer is ignored.
      */
     void sgll_dma_struct_init(sgll_dma_init_t *config);
 
     /**
      * @brief 初始化调用者拥有的已停止通道及其描述符。
      *        Initialize a caller-owned stopped channel and its descriptor.
-     * @ingroup SGLL_DMA
      *
-     * @param channel DMA 通道编号，范围为 0 到 7。
-     *        DMA channel index from 0 through 7.
+     * @param channel DMA 通道编号，范围为 0 到 7 / DMA channel index from 0 through 7.
      * @param[out] lli 调用者提供且按 64 字节对齐的描述符存储。
      *        Caller-provided, 64-byte-aligned descriptor storage.
-     * @param[in] config 调用者提供的初始化配置。
-     *        Caller-provided initialization configuration.
+     * @param[in] config 调用者提供的初始化配置 / Caller-provided initialization configuration.
      * @return 成功返回 true；参数无效或通道活动时返回 false。
      *         True on success; false for invalid arguments or an active channel.
      * @note 失败不修改寄存器或描述符。成功不启动通道、不打开全局控制器，也不改变 TOP 中断路由。
      *       Failure changes neither registers nor the descriptor. Success does not start the channel, enable
-     * the global controller, or change TOP interrupt routing.
+     *       the global controller, or change TOP interrupt routing.
      * @note 启用通道前由调用者按方向维护载荷缓存并写回描述符；循环模式 next 为 0 时自链接。
      *       Before enabling the channel, maintain payload caches by direction and clean the descriptor;
-     * circular mode self-links when next is zero.
+     *       circular mode self-links when next is zero.
      */
     bool sgll_dma_init(uint32_t channel, DMA_LLI_Type *lli, const sgll_dma_init_t *config);
 
     /**
-     * @brief 清理一个已停止的 DMA 通道。
-     *        Clear one stopped DMA channel.
-     * @ingroup SGLL_DMA
+     * @brief 清理一个已停止的 DMA 通道 / Clear one stopped DMA channel.
      *
-     * @param channel DMA 通道编号，范围为 0 到 7。
-     *        DMA channel index from 0 through 7.
+     * @param channel DMA 通道编号，范围为 0 到 7 / DMA channel index from 0 through 7.
      * @return 成功返回 true；通道无效或仍活动时返回 false。
      *         True on success; false for an invalid or active channel.
      * @note 调用者先请求停止并等待完成；其他通道、全局控制器和请求映射保持不变。
      *       Request disable and wait for completion first; other channels, the global controller, and request
-     * mappings are preserved.
+     *       mappings are preserved.
      */
     bool sgll_dma_deinit(uint32_t channel);
 
     /**
      * @brief 构造一个调用者提供存储的 DMA 链表描述符。
      *        Build one DMA linked-list item in caller-provided storage.
-     * @ingroup SGLL_DMA
      *
      * @param[out] lli 调用者提供且按 64 字节对齐的描述符存储。
      *        Caller-provided, 64-byte-aligned descriptor storage.
-     * @param source 数据源地址。
-     *        Source data address.
-     * @param destination 数据目的地址。
-     *        Destination data address.
+     * @param source 数据源地址 / Source data address.
+     * @param destination 数据目的地址 / Destination data address.
      * @param count 数据元素数量，范围为 1 到 DMA_BLOCK_TRANSFER_MAX。
      *        Item count from 1 through DMA_BLOCK_TRANSFER_MAX.
-     * @param direction DMA 传输方向。
-     *        DMA transfer direction.
-     * @param width DMA 元素宽度，字节或半字。
-     *        DMA item width: byte or half-word.
-     * @param mode 普通或循环传输模式。
-     *        Normal or circular transfer mode.
+     * @param direction DMA 传输方向 / DMA transfer direction.
+     * @param width DMA 元素宽度，字节或半字 / DMA item width: byte or half-word.
+     * @param mode 普通或循环传输模式 / Normal or circular transfer mode.
      * @param next 下一描述符地址；非零值必须按 64 字节对齐。
      *        Next descriptor address; nonzero values must be 64-byte aligned.
      * @return 地址、计数和链接检查通过时返回 true；否则不修改描述符并返回 false。
      *         True when address, count, and link checks pass; otherwise false without modifying the
-     * descriptor.
+     *         descriptor.
      * @pre direction、width、mode 必须有效，数据地址按元素宽度对齐；此底层构造器不验证这些条件。
      *      direction, width, and mode must be valid and data addresses aligned to the item width; this
-     * low-level builder does not validate these conditions.
+     *      low-level builder does not validate these conditions.
      * @note 所有非零链接按 64 字节对齐；循环模式必须提供非零 next。提交前写回描述符缓存。
      *       All nonzero links are 64-byte aligned; circular mode requires a nonzero next. Clean the
-     * descriptor cache before submission.
+     *       descriptor cache before submission.
      */
     bool sgll_dma_lli_build(
         DMA_LLI_Type *lli, uintptr_t source, uintptr_t destination, uint32_t count,
@@ -599,10 +488,8 @@ extern "C"
     /**
      * @brief 写入已停止通道的 CFG 和链表起始地址。
      *        Write CFG and the linked-list address of a stopped channel.
-     * @ingroup SGLL_DMA
      *
-     * @param channel DMA 通道编号，范围为 0 到 7。
-     *        DMA channel index from 0 through 7.
+     * @param channel DMA 通道编号，范围为 0 到 7 / DMA channel index from 0 through 7.
      * @param config 由 sgll_dma_config_build 构造的通道 CFG 编码。
      *        Channel CFG encoding produced by sgll_dma_config_build.
      * @param lli_address 非零且按 64 字节对齐的链表描述符地址。
@@ -611,17 +498,15 @@ extern "C"
      *         True for a valid channel and descriptor address; otherwise no registers are written.
      * @pre 调用者必须先停止通道；本函数只检查编号和描述符地址。
      *      The caller must first stop the channel; this function only checks the index and descriptor
-     * address.
+     *      address.
      */
     bool sgll_dma_channel_configure(uint32_t channel, uint64_t config, uintptr_t lli_address);
 
     /**
      * @brief 有界轮询等待 DMA 通道停止。
      *        Poll a DMA channel for disable completion with a bounded attempt count.
-     * @ingroup SGLL_DMA
      *
-     * @param channel DMA 通道编号，范围为 0 到 7。
-     *        DMA channel index from 0 through 7.
+     * @param channel DMA 通道编号，范围为 0 到 7 / DMA channel index from 0 through 7.
      * @param attempts 最多读取使能寄存器的次数；0 表示不轮询。
      *        Maximum enable-register reads; zero performs no polling.
      * @return 观察到通道停止时为 true；通道无效或次数耗尽时为 false。
@@ -634,12 +519,9 @@ extern "C"
 #endif
 
 /**
- * @brief 获取普通或循环传输使用的 DMA 中断掩码。
- *        Get the DMA interrupt mask for normal or circular transfers.
- * @ingroup SGLL_DMA
+ * @brief 获取普通或循环传输使用的 DMA 中断掩码 / Get the DMA interrupt mask for normal or circular transfers.
  *
- * @param mode 普通或循环传输模式。
- *        Normal or circular transfer mode.
+ * @param mode 普通或循环传输模式 / Normal or circular transfer mode.
  * @return 块完成及错误位；普通模式还包含传输完成位。
  *         Block-completion and error bits, plus transfer-completion in normal mode.
  */
@@ -657,11 +539,8 @@ extern "C"
     /**
      * @brief 有界等待指定 DMA 通道集合全部停止。
      *        Wait for all selected DMA channels to stop with a bounded attempt count.
-     * @ingroup SGLL_DMA
-     * @param channels 待停止的通道位掩码。
-     *        Mask of channels to await.
-     * @param attempts 最大状态读取次数，零表示不轮询。
-     *        Maximum status reads; zero performs no polling.
+     * @param channels 待停止的通道位掩码 / Mask of channels to await.
+     * @param attempts 最大状态读取次数，零表示不轮询 / Maximum status reads; zero performs no polling.
      * @return 全部停止时为 true；掩码无效或超时为 false。
      *        True when all have stopped; false for an invalid mask or timeout.
      */

@@ -1,30 +1,17 @@
-/**
- * @file sg200x_ll_uart.c
- * @brief UART 波特率、帧格式初始化和单实例复位。
- *        UART baud-rate and frame-format initialization and per-instance reset.
- *
- * @ingroup SGLL_UART
- * @see SG2002 TRM 21.2.4.1；波特率分频。Baud-rate division.
- */
-
 #include "sg200x_ll_uart.h"
 #include "sg200x_ll_csr.h"
 #include "sg200x_ll_rcc.h"
 
 /**
- * @brief 查找 UART 实例对应的复位目标。
- *        Find the reset target corresponding to a UART instance.
+ * @brief 查找 UART 实例对应的复位目标 / Find the reset target corresponding to a UART instance.
  *
- * @param uart UART 寄存器实例地址。
- *        UART register-instance address.
- * @return 匹配的目标；未知地址返回 RESET_NONE。
- *         Matching target, or RESET_NONE for an unknown address.
+ * @param uart UART 寄存器实例地址 / UART register-instance address.
+ * @return 匹配的目标；未知地址返回 RESET_NONE / Matching target, or RESET_NONE for an unknown address.
  */
 static rstgen_reset_target_t uart_reset_target(const UART_Type *uart)
 {
-    static const rstgen_reset_target_t resets[UART_COUNT] = {
-        RESET_UART0, RESET_UART1, RESET_UART2, RESET_UART3, RESET_UART4
-    };
+    static const rstgen_reset_target_t resets[UART_COUNT] =
+        {RESET_UART0, RESET_UART1, RESET_UART2, RESET_UART3, RESET_UART4};
     for (uint32_t index = 0U; index < UART_COUNT; ++index)
     {
         if (uart == sgll_uart_get(index))

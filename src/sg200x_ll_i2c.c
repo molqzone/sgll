@@ -1,30 +1,17 @@
-/**
- * @file sg200x_ll_i2c.c
- * @brief I2C 默认配置、初始化和单实例复位。
- *        I2C defaults, initialization, and per-instance reset.
- *
- * @ingroup SGLL_I2C
- * @see SG2002 TRM 表 21.1；25/100 MHz 时序。Table 21.1, 25/100 MHz timing.
- */
-
 #include "sg200x_ll_i2c.h"
 #include "sg200x_ll_csr.h"
 #include "sg200x_ll_rcc.h"
 
 /**
- * @brief 查找 I2C 实例对应的复位目标。
- *        Find the reset target corresponding to an I2C instance.
+ * @brief 查找 I2C 实例对应的复位目标 / Find the reset target corresponding to an I2C instance.
  *
- * @param i2c I2C 寄存器实例地址。
- *        I2C register-instance address.
- * @return 匹配的目标；未知地址返回 RESET_NONE。
- *         Matching target, or RESET_NONE for an unknown address.
+ * @param i2c I2C 寄存器实例地址 / I2C register-instance address.
+ * @return 匹配的目标；未知地址返回 RESET_NONE / Matching target, or RESET_NONE for an unknown address.
  */
 static rstgen_reset_target_t i2c_reset_target(const I2C_Type *i2c)
 {
-    static const rstgen_reset_target_t resets[I2C_COUNT] = {
-        RESET_I2C0, RESET_I2C1, RESET_I2C2, RESET_I2C3, RESET_I2C4
-    };
+    static const rstgen_reset_target_t resets[I2C_COUNT] =
+        {RESET_I2C0, RESET_I2C1, RESET_I2C2, RESET_I2C3, RESET_I2C4};
     for (uint32_t index = 0U; index < I2C_COUNT; ++index)
     {
         if (i2c == sgll_i2c_get(index))
@@ -39,8 +26,7 @@ static rstgen_reset_target_t i2c_reset_target(const I2C_Type *i2c)
  * @brief 确认 I2C 的使能和中止位均清零且禁用已完成。
  *        Confirm that I2C enable and abort bits are clear and disable has completed.
  *
- * @param i2c I2C 寄存器实例。
- *        I2C register instance.
+ * @param i2c I2C 寄存器实例 / I2C register instance.
  * @return 控制寄存器与实际使能状态均表示已停止时为 true。
  *         True when control and actual enable status both indicate a stopped controller.
  */
@@ -66,12 +52,9 @@ void sgll_i2c_struct_init(sgll_i2c_init_t *config)
 }
 
 /**
- * @brief 检查 I2C 时序字段范围。
- *        Validate I2C timing field ranges.
- * @param timing 待检查的时序。
- *        Timing to validate.
- * @return 所有字段均可表示时返回 true。
- *        True when all fields are representable.
+ * @brief 检查 I2C 时序字段范围 / Validate I2C timing field ranges.
+ * @param timing 待检查的时序 / Timing to validate.
+ * @return 所有字段均可表示时返回 true / True when all fields are representable.
  */
 static bool i2c_timing_valid(const sgll_i2c_timing_t *timing)
 {
@@ -85,14 +68,10 @@ static bool i2c_timing_valid(const sgll_i2c_timing_t *timing)
 }
 
 /**
- * @brief 将纳秒预算向上换算为时钟计数。
- *        Round a nanosecond budget upward to clock cycles.
- * @param clock_hz 输入时钟频率。
- *        Input clock frequency.
- * @param nanoseconds 时间预算。
- *        Time budget.
- * @return 向上取整的周期数。
- *        Rounded-up cycle count.
+ * @brief 将纳秒预算向上换算为时钟计数 / Round a nanosecond budget upward to clock cycles.
+ * @param clock_hz 输入时钟频率 / Input clock frequency.
+ * @param nanoseconds 时间预算 / Time budget.
+ * @return 向上取整的周期数 / Rounded-up cycle count.
  */
 static uint32_t i2c_cycles(uint32_t clock_hz, uint32_t nanoseconds)
 {

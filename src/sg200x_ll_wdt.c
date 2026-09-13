@@ -1,19 +1,10 @@
-/**
- * @file sg200x_ll_wdt.c
- * @brief 看门狗配置、启动与 TOP 复位路由。
- *        Watchdog configuration, start, and TOP reset routing.
- * @ingroup SGLL_WDT
- */
 #include "sg200x_ll_wdt.h"
 #include "sg200x_ll_csr.h"
 
 /**
- * @brief 检查主域看门狗实例。
- *        Validate a main-domain watchdog instance.
- * @param wdt 主域 WDT0 至 WDT2 寄存器实例。
- *        Main-domain WDT0 through WDT2 register instance.
- * @return WDT0 至 WDT2 返回 true。
- *        True for WDT0 through WDT2.
+ * @brief 检查主域看门狗实例 / Validate a main-domain watchdog instance.
+ * @param wdt 主域 WDT0 至 WDT2 寄存器实例 / Main-domain WDT0 through WDT2 register instance.
+ * @return WDT0 至 WDT2 返回 true / True for WDT0 through WDT2.
  */
 static bool wdt_instance_valid(const WDT_Type *wdt)
 {

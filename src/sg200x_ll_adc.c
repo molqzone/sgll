@@ -1,19 +1,10 @@
-/**
- * @file sg200x_ll_adc.c
- * @brief SARADC 默认配置、单次触发和有界等待。
- *        SARADC defaults, single-conversion trigger, and bounded waits.
- * @ingroup SGLL_ADC
- */
 #include "sg200x_ll_adc.h"
 #include "sg200x_ll_csr.h"
 
 /**
- * @brief 检查 SARADC 电源域实例。
- *        Validate a SARADC power-domain instance.
- * @param adc 主域或 RTC 域 SARADC 实例。
- *        Main-domain or RTC-domain SARADC instance.
- * @return 主域或 RTC 域实例返回 true。
- *        True for the main-domain or RTC-domain instance.
+ * @brief 检查 SARADC 电源域实例 / Validate a SARADC power-domain instance.
+ * @param adc 主域或 RTC 域 SARADC 实例 / Main-domain or RTC-domain SARADC instance.
+ * @return 主域或 RTC 域实例返回 true / True for the main-domain or RTC-domain instance.
  */
 static bool adc_instance_valid(const SARADC_Type *adc)
 {

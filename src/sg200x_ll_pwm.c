@@ -1,21 +1,12 @@
-/**
- * @file sg200x_ll_pwm.c
- * @brief PWM 初始化、周期更新和有序启动停止。
- *        PWM initialization, period updates, and ordered start/stop.
- * @ingroup SGLL_PWM
- */
 #include "sg200x_ll_pwm.h"
 #include "sg200x_ll_csr.h"
 
 /**
- * @brief 检查 PWM 实例及通道掩码。
- *        Validate a PWM instance and channel mask.
- * @param pwm PWM 寄存器实例。
- *        PWM register instance.
+ * @brief 检查 PWM 实例及通道掩码 / Validate a PWM instance and channel mask.
+ * @param pwm PWM 寄存器实例 / PWM register instance.
  * @param channels 控制器内通道掩码，仅低四位有效。
  *        Channel mask within the controller; only the low four bits are valid.
- * @return 实例和掩码均有效时返回 true。
- *        True when both the instance and mask are valid.
+ * @return 实例和掩码均有效时返回 true / True when both the instance and mask are valid.
  */
 static bool pwm_channels_valid(const PWM_Type *pwm, uint32_t channels)
 {

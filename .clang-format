@@ -1,4 +1,8 @@
-Language: C
+# The language is detected from each file's extension. A top-level `Language:`
+# key is reserved for multi-language configuration files, whose values are
+# restricted to the LanguageKind scalars (Cpp, CSharp, Java, ...); the spelling
+# `C` is not one of them and made clang-format reject this whole file with
+# "unknown enumerated scalar". Do not reintroduce it.
 BasedOnStyle: LLVM
 IndentWidth: 4
 TabWidth: 4
@@ -8,3 +12,21 @@ ColumnLimit: 110
 AllowShortIfStatementsOnASingleLine: false
 AlignAfterOpenBracket: BlockIndent
 AlwaysBreakTemplateDeclarations: Yes
+
+# --- Device-header (CMSIS / STM32 LL) adaptations -------------------------
+# Register blocks keep one declaration per line with the offset note in a
+# trailing `/*!< ... */` comment, so the comment column is aligned and the
+# comment text is never rewrapped: reflowing would push `Address offset:`
+# onto its own line and break the "one register, one line" reading.
+AlignTrailingComments: true
+ReflowComments: false
+# Continuation backslashes stay next to the macro body. The LLVM default
+# (`Right`) pads them out to ColumnLimit, which turns the register-map macros
+# into a wall of trailing spaces.
+AlignEscapedNewlines: Left
+# `#define` bodies are values, not a table: aligning them adds no information.
+AlignConsecutiveMacros: false
+# Keeps `volatile uint32_t NAME;` intact instead of splitting the declarator
+# onto its own line when the trailing comment is long.
+AllowAllArgumentsOnNextLine: true
+PenaltyBreakBeforeFirstCallParameter: 100

@@ -1,21 +1,3 @@
-/**
- * @file sg200x_ll_dmamux.h
- * @brief SG2002 TOP DMA 中断路由操作。
- *        SG2002 TOP DMA interrupt-routing operations.
- * @ingroup SGLL_DMAMUX
- *
- * @note SG2002 将此逻辑置于 TOP_MISC 中，没有独立的 DMAMUX 寄存器块。
- *       SG2002 places this logic in TOP_MISC rather than a separate DMAMUX register block.
- * @note 接口不分配通道，也不强制 Linux/C906L 分区；上层负责共享字段的所有权和串行化。
- *       The interfaces neither allocate channels nor enforce a Linux/C906L partition; upper layers manage
- * ownership and serialize shared fields.
- */
-
-/**
- * @defgroup SGLL_DMAMUX DMA 中断路由 / DMA interrupt routing
- * @ingroup SGLL
- */
-
 #pragma once
 
 #include <stdbool.h>
@@ -25,14 +7,10 @@
 #include "sg200x_ll_utils.h"
 
 /**
- * @brief 读取指定 CPU 的 TOP DMA 中断路由字段。
- *        Read one CPU's TOP DMA interrupt-route field.
- * @ingroup SGLL_DMAMUX
+ * @brief 读取指定 CPU 的 TOP DMA 中断路由字段 / Read one CPU's TOP DMA interrupt-route field.
  *
- * @param cpu CPU 路由编号，范围为 0 到 2。
- *        CPU route index from 0 through 2.
- * @return 该 CPU 的 9 位路由字段。
- *         The CPU's nine-bit routing field.
+ * @param cpu CPU 路由编号，范围为 0 到 2 / CPU route index from 0 through 2.
+ * @return 该 CPU 的 9 位路由字段 / The CPU's nine-bit routing field.
  * @pre cpu 必须为 0、1 或 2；该原语不报告无效 CPU 编号。
  *      cpu must be 0, 1, or 2; this primitive does not report invalid CPU indices.
  */
@@ -45,19 +23,16 @@ static inline uint32_t sgll_dmamux_interrupt_route_get(uint32_t cpu)
 }
 
 /**
- * @brief 替换指定 CPU 的 TOP DMA 中断路由字段。
- *        Replace one CPU's TOP DMA interrupt-route field.
- * @ingroup SGLL_DMAMUX
+ * @brief 替换指定 CPU 的 TOP DMA 中断路由字段 / Replace one CPU's TOP DMA interrupt-route field.
  *
- * @param cpu CPU 路由编号，范围为 0 到 2。
- *        CPU route index from 0 through 2.
+ * @param cpu CPU 路由编号，范围为 0 到 2 / CPU route index from 0 through 2.
  * @param channels 当前 CPU 的路由位掩码，仅低 9 位写入。
  *        Routing mask for this CPU; only the low nine bits are written.
  * @pre cpu 必须为 0、1 或 2；该原语不报告无效 CPU 编号。
  *      cpu must be 0, 1, or 2; this primitive does not report invalid CPU indices.
  * @note 保留其他 CPU 的字段；当前 CPU 字段整体替换，调用者须保留其中不归自己管理的通道。
  *       Other CPUs' fields are preserved; the selected field is replaced in full, so retain channels owned by
- * other users.
+ *       other users.
  */
 static inline void sgll_dmamux_interrupt_route_set(uint32_t cpu, uint32_t channels)
 {
@@ -71,15 +46,10 @@ static inline void sgll_dmamux_interrupt_route_set(uint32_t cpu, uint32_t channe
 }
 
 /**
- * @brief 查询 SPI 实例对应的 DMA 请求编号。
- *        Look up the DMA request number for a SPI instance.
- * @ingroup SGLL_DMAMUX
- * @param index 主域外设实例编号。
- *        Main-domain peripheral instance index.
- * @param transmit 为 true 选择发送请求，否则选择接收请求。
- *        True selects transmit; false selects receive.
- * @return 请求编号；无效实例返回 DMA_REQUEST_NONE。
- *        Request number; DMA_REQUEST_NONE for an invalid instance.
+ * @brief 查询 SPI 实例对应的 DMA 请求编号 / Look up the DMA request number for a SPI instance.
+ * @param index 主域外设实例编号 / Main-domain peripheral instance index.
+ * @param transmit 为 true 选择发送请求，否则选择接收请求 / True selects transmit; false selects receive.
+ * @return 请求编号；无效实例返回 DMA_REQUEST_NONE / Request number; DMA_REQUEST_NONE for an invalid instance.
  */
 static inline uint32_t sgll_dmamux_spi_request_get(uint32_t index, bool transmit)
 {
@@ -99,15 +69,10 @@ static inline uint32_t sgll_dmamux_spi_request_get(uint32_t index, bool transmit
 }
 
 /**
- * @brief 查询 I2C 实例对应的 DMA 请求编号。
- *        Look up the DMA request number for a I2C instance.
- * @ingroup SGLL_DMAMUX
- * @param index 主域外设实例编号。
- *        Main-domain peripheral instance index.
- * @param transmit 为 true 选择发送请求，否则选择接收请求。
- *        True selects transmit; false selects receive.
- * @return 请求编号；无效实例返回 DMA_REQUEST_NONE。
- *        Request number; DMA_REQUEST_NONE for an invalid instance.
+ * @brief 查询 I2C 实例对应的 DMA 请求编号 / Look up the DMA request number for a I2C instance.
+ * @param index 主域外设实例编号 / Main-domain peripheral instance index.
+ * @param transmit 为 true 选择发送请求，否则选择接收请求 / True selects transmit; false selects receive.
+ * @return 请求编号；无效实例返回 DMA_REQUEST_NONE / Request number; DMA_REQUEST_NONE for an invalid instance.
  */
 static inline uint32_t sgll_dmamux_i2c_request_get(uint32_t index, bool transmit)
 {

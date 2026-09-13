@@ -1,11 +1,3 @@
-/**
- * @file sg200x_ll_dma.c
- * @brief DMA 描述符构造、通道初始化和有界等待。
- *        DMA descriptor construction, channel initialization, and bounded waits.
- *
- * @ingroup SGLL_DMA
- */
-
 #include "sg200x_ll_dma.h"
 #include "sg200x_ll_csr.h"
 
@@ -13,10 +5,8 @@
  * @brief 检查 DMA 初始化配置的地址、计数、模式和请求方向。
  *        Check DMA initialization addresses, count, modes, and request direction.
  *
- * @param[in] config 待验证的配置。
- *        Configuration to validate.
- * @return 全部配置检查通过时返回 true。
- *         True when all configuration checks pass.
+ * @param[in] config 待验证的配置 / Configuration to validate.
+ * @return 全部配置检查通过时返回 true / True when all configuration checks pass.
  * @note TRM 表 9.1 中，UART/SPI/I2C 接收请求编号为偶数，发送请求编号为奇数。
  *       In TRM Table 9.1, UART/SPI/I2C receive requests use even IDs and transmit requests odd IDs.
  */

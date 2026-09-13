@@ -1,31 +1,12 @@
-/**
- * @file sg200x_ll_uart.h
- * @brief 基于 SVD 的 DesignWare APB UART 低层接口。
- *        SVD-derived DesignWare APB UART low-level interfaces.
- * @ingroup SGLL_UART
- *
- * @note 寄存器布局来自 SVD 的 DW_apb_uart 视图；DLL/DLH 与收发、中断寄存器按 LCR.DLAB 切换。
- *       Register layouts follow SVD DW_apb_uart views; LCR.DLAB selects DLL/DLH versus receive/transmit and
- * interrupt registers.
- * @see sg2002-licheerv-nano-b.svd；UART 寄存器描述。UART register descriptions.
- */
-
-/**
- * @defgroup SGLL_UART UART 串口 / UART serial port
- * @ingroup SGLL
- */
 #pragma once
 
 #include <stdbool.h>
 #include <stdint.h>
 
 #include "sg2002.h"
-#include "sg200x_ll_utils.h"
 
 /**
- * @brief UART 数据位长度编码。
- *        UART data-bit length encoding.
- * @ingroup SGLL_UART
+ * @brief UART 数据位长度编码 / UART data-bit length encoding.
  */
 typedef enum
 {
@@ -36,9 +17,7 @@ typedef enum
 } sgll_uart_data_bits_t;
 
 /**
- * @brief UART 停止位选择。
- *        UART stop-bit selection.
- * @ingroup SGLL_UART
+ * @brief UART 停止位选择 / UART stop-bit selection.
  */
 typedef enum
 {
@@ -49,9 +28,7 @@ typedef enum
 } sgll_uart_stop_bits_t;
 
 /**
- * @brief UART 奇偶校验选择。
- *        UART parity selection.
- * @ingroup SGLL_UART
+ * @brief UART 奇偶校验选择 / UART parity selection.
  */
 typedef enum
 {
@@ -65,7 +42,6 @@ typedef enum
 /**
  * @brief UART 波特率、帧格式和 FIFO 初始化参数。
  *        UART baud-rate, frame-format, and FIFO initialization parameters.
- * @ingroup SGLL_UART
  */
 typedef struct
 {
@@ -88,27 +64,21 @@ extern "C"
 #endif
 
     /**
-     * @brief 填充 UART 默认初始化参数。
-     *        Fill default UART initialization parameters.
-     * @ingroup SGLL_UART
+     * @brief 填充 UART 默认初始化参数 / Fill default UART initialization parameters.
      *
      * @param[out] config 接收默认配置的结构体指针，可为空。
      *        Destination for default configuration; may be null.
      * @note 默认 115200 波特、8N1、FIFO 开启且无硬件流控；空指针不执行操作。
      *       Defaults are 115200 baud, 8N1, FIFOs enabled, and no hardware flow control; a null pointer is
-     * ignored.
+     *       ignored.
      */
     void sgll_uart_struct_init(sgll_uart_init_t *config);
 
     /**
-     * @brief 用实际外设时钟配置一个空闲 UART。
-     *        Configure an idle UART using the actual peripheral clock.
-     * @ingroup SGLL_UART
+     * @brief 用实际外设时钟配置一个空闲 UART / Configure an idle UART using the actual peripheral clock.
      *
-     * @param uart UART 寄存器实例。
-     *        UART register instance.
-     * @param[in] config 调用者提供的初始化配置。
-     *        Caller-provided initialization configuration.
+     * @param uart UART 寄存器实例 / UART register instance.
+     * @param[in] config 调用者提供的初始化配置 / Caller-provided initialization configuration.
      * @param peripheral_clock_hz 实际外设输入时钟频率，单位为 Hz。
      *        Actual peripheral input clock frequency in Hz.
      * @return 成功返回 true；参数无效或 UART 忙时不写寄存器并返回 false。
@@ -117,17 +87,14 @@ extern "C"
      *       Only UART0-4 are supported; the divisor is rounded to nearest. Quiesce the peer and DMA first.
      * @note 成功后 DLAB 清零、中断关闭、FIFO 复位；1.5 停止位仅适用 5 数据位，2 停止位适用 6-8 数据位。
      *       Success clears DLAB, disables interrupts, and resets FIFOs; 1.5 stop bits require five data bits
-     * and two stop bits require six to eight.
+     *       and two stop bits require six to eight.
      */
     bool sgll_uart_init(UART_Type *uart, const sgll_uart_init_t *config, uint32_t peripheral_clock_hz);
 
     /**
-     * @brief 复位一个空闲 UART 实例。
-     *        Reset one idle UART instance.
-     * @ingroup SGLL_UART
+     * @brief 复位一个空闲 UART 实例 / Reset one idle UART instance.
      *
-     * @param uart UART 寄存器实例。
-     *        UART register instance.
+     * @param uart UART 寄存器实例 / UART register instance.
      * @return 成功返回 true；实例无效或 UART 忙时返回 false。
      *         True on success; false for an invalid or busy UART.
      * @note 调用者先使对端和 DMA 静止；仅脉冲此 UART 的复位位。
@@ -139,14 +106,10 @@ extern "C"
 #endif
 
 /**
- * @brief 按编号获取 UART0 至 UART4。
- *        Get UART0 through UART4 by index.
- * @ingroup SGLL_UART
+ * @brief 按编号获取 UART0 至 UART4 / Get UART0 through UART4 by index.
  *
- * @param index 实例编号，范围为 0 到 4。
- *        Instance index from 0 through 4.
- * @return 实例指针；编号无效时返回空指针。
- *         Instance pointer, or null for an invalid index.
+ * @param index 实例编号，范围为 0 到 4 / Instance index from 0 through 4.
+ * @return 实例指针；编号无效时返回空指针 / Instance pointer, or null for an invalid index.
  */
 static inline UART_Type *sgll_uart_get(uint32_t index)
 {
@@ -168,14 +131,10 @@ static inline UART_Type *sgll_uart_get(uint32_t index)
 }
 
 /**
- * @brief 设置 UART 分频锁存器访问选择位。
- *        Set the UART divisor-latch access selector.
- * @ingroup SGLL_UART
+ * @brief 设置 UART 分频锁存器访问选择位 / Set the UART divisor-latch access selector.
  *
- * @param uart UART 寄存器实例。
- *        UART register instance.
- * @param enable 为 true 时使能，为 false 时禁止。
- *        True to enable; false to disable.
+ * @param uart UART 寄存器实例 / UART register instance.
+ * @param enable 为 true 时使能，为 false 时禁止 / True to enable; false to disable.
  */
 static inline void sgll_uart_divisor_latch_enable(UART_Type *uart, bool enable)
 {
@@ -184,14 +143,10 @@ static inline void sgll_uart_divisor_latch_enable(UART_Type *uart, bool enable)
 }
 
 /**
- * @brief 写入 UART 的低、高字节波特率分频值。
- *        Write the low and high bytes of the UART baud divisor.
- * @ingroup SGLL_UART
+ * @brief 写入 UART 的低、高字节波特率分频值 / Write the low and high bytes of the UART baud divisor.
  *
- * @param uart UART 寄存器实例。
- *        UART register instance.
- * @param divisor 写入 DLL/DLH 的 16 位波特率分频值。
- *        Sixteen-bit baud divisor written to DLL/DLH.
+ * @param uart UART 寄存器实例 / UART register instance.
+ * @param divisor 写入 DLL/DLH 的 16 位波特率分频值 / Sixteen-bit baud divisor written to DLL/DLH.
  * @pre 调用者先设置 LCR.DLAB，并在写入后按需清除；本函数不切换寄存器银行。
  *      Set LCR.DLAB first and clear it afterward as needed; this function does not switch register banks.
  */
@@ -202,14 +157,10 @@ static inline void sgll_uart_baud_divisor_set(UART_Type *uart, uint16_t divisor)
 }
 
 /**
- * @brief 设置 FIFO 使能并清除其他 FCR 配置位。
- *        Set FIFO enable and clear the other FCR configuration bits.
- * @ingroup SGLL_UART
+ * @brief 设置 FIFO 使能并清除其他 FCR 配置位 / Set FIFO enable and clear the other FCR configuration bits.
  *
- * @param uart UART 寄存器实例。
- *        UART register instance.
- * @param enable 为 true 时使能，为 false 时禁止。
- *        True to enable; false to disable.
+ * @param uart UART 寄存器实例 / UART register instance.
+ * @param enable 为 true 时使能，为 false 时禁止 / True to enable; false to disable.
  */
 static inline void sgll_uart_fifo_enable(UART_Type *uart, bool enable)
 {
@@ -217,12 +168,9 @@ static inline void sgll_uart_fifo_enable(UART_Type *uart, bool enable)
 }
 
 /**
- * @brief 使能 FIFO 并复位收发 FIFO。
- *        Enable and reset both receive and transmit FIFOs.
- * @ingroup SGLL_UART
+ * @brief 使能 FIFO 并复位收发 FIFO / Enable and reset both receive and transmit FIFOs.
  *
- * @param uart UART 寄存器实例。
- *        UART register instance.
+ * @param uart UART 寄存器实例 / UART register instance.
  * @note 此操作丢弃 FIFO 中的数据，并将其他 FCR 配置位清零。
  *       This discards FIFO contents and clears the other FCR configuration bits.
  */
@@ -232,38 +180,26 @@ static inline void sgll_uart_fifo_reset(UART_Type *uart)
 }
 
 /**
- * @brief 写入 UART 帧格式控制寄存器的低 8 位。
- *        Write the low eight bits of the UART line-control register.
- * @ingroup SGLL_UART
+ * @brief 写入 UART 帧格式控制寄存器的低 8 位 / Write the low eight bits of the UART line-control register.
  *
- * @param uart UART 寄存器实例。
- *        UART register instance.
- * @param value 要写入或编码的数值。
- *        Value to write or encode.
+ * @param uart UART 寄存器实例 / UART register instance.
+ * @param value 要写入或编码的数值 / Value to write or encode.
  */
 static inline void sgll_uart_line_control_set(UART_Type *uart, uint32_t value) { uart->LCR = value & 0xFFU; }
 
 /**
- * @brief 读取 UART 线路状态寄存器。
- *        Read the UART line-status register.
- * @ingroup SGLL_UART
+ * @brief 读取 UART 线路状态寄存器 / Read the UART line-status register.
  *
- * @param uart UART 寄存器实例。
- *        UART register instance.
- * @return LSR 当前值。
- *         Current LSR value.
+ * @param uart UART 寄存器实例 / UART register instance.
+ * @return LSR 当前值 / Current LSR value.
  */
 static inline uint32_t sgll_uart_line_status_get(const UART_Type *uart) { return uart->LSR; }
 
 /**
- * @brief 检查 UART 是否有接收数据。
- *        Check whether UART receive data is available.
- * @ingroup SGLL_UART
+ * @brief 检查 UART 是否有接收数据 / Check whether UART receive data is available.
  *
- * @param uart UART 寄存器实例。
- *        UART register instance.
- * @return LSR 数据就绪位置位时返回 true。
- *         True when the LSR data-ready bit is set.
+ * @param uart UART 寄存器实例 / UART register instance.
+ * @return LSR 数据就绪位置位时返回 true / True when the LSR data-ready bit is set.
  */
 static inline bool sgll_uart_rx_ready(const UART_Type *uart)
 {
@@ -271,14 +207,10 @@ static inline bool sgll_uart_rx_ready(const UART_Type *uart)
 }
 
 /**
- * @brief 检查 UART 发送保持寄存器是否为空。
- *        Check whether the UART transmit holding register is empty.
- * @ingroup SGLL_UART
+ * @brief 检查 UART 发送保持寄存器是否为空 / Check whether the UART transmit holding register is empty.
  *
- * @param uart UART 寄存器实例。
- *        UART register instance.
- * @return LSR THR 空位置位时返回 true。
- *         True when the LSR THR-empty bit is set.
+ * @param uart UART 寄存器实例 / UART register instance.
+ * @return LSR THR 空位置位时返回 true / True when the LSR THR-empty bit is set.
  */
 static inline bool sgll_uart_tx_ready(const UART_Type *uart)
 {
@@ -286,53 +218,37 @@ static inline bool sgll_uart_tx_ready(const UART_Type *uart)
 }
 
 /**
- * @brief 向 UART 发送保持寄存器写入一个字节。
- *        Write one byte to the UART transmit holding register.
- * @ingroup SGLL_UART
+ * @brief 向 UART 发送保持寄存器写入一个字节 / Write one byte to the UART transmit holding register.
  *
- * @param uart UART 寄存器实例。
- *        UART register instance.
- * @param value 要写入或编码的数值。
- *        Value to write or encode.
+ * @param uart UART 寄存器实例 / UART register instance.
+ * @param value 要写入或编码的数值 / Value to write or encode.
  * @pre LCR.DLAB 必须为 0；调用者负责检查相应 FIFO/保持寄存器状态。
  *      LCR.DLAB must be zero; the caller checks the relevant FIFO/holding-register state.
  */
 static inline void sgll_uart_data_write(UART_Type *uart, uint8_t value) { uart->RBR_THR_DLL = value; }
 
 /**
- * @brief 从 UART 接收缓冲寄存器读取一个字节。
- *        Read one byte from the UART receive buffer register.
- * @ingroup SGLL_UART
+ * @brief 从 UART 接收缓冲寄存器读取一个字节 / Read one byte from the UART receive buffer register.
  *
- * @param uart UART 寄存器实例。
- *        UART register instance.
- * @return 接收的低 8 位数据。
- *         Received low eight bits.
+ * @param uart UART 寄存器实例 / UART register instance.
+ * @return 接收的低 8 位数据 / Received low eight bits.
  * @pre LCR.DLAB 必须为 0；调用者负责检查相应 FIFO/保持寄存器状态。
  *      LCR.DLAB must be zero; the caller checks the relevant FIFO/holding-register state.
  */
 static inline uint8_t sgll_uart_data_read(UART_Type *uart) { return (uint8_t)uart->RBR_THR_DLL; }
 
 /**
- * @brief 读取 DesignWare UART 状态寄存器。
- *        Read the DesignWare UART status register.
- * @ingroup SGLL_UART
+ * @brief 读取 DesignWare UART 状态寄存器 / Read the DesignWare UART status register.
  *
- * @param uart UART 寄存器实例。
- *        UART register instance.
- * @return USR 当前值。
- *         Current USR value.
+ * @param uart UART 寄存器实例 / UART register instance.
+ * @return USR 当前值 / Current USR value.
  */
 static inline uint32_t sgll_uart_status_get(const UART_Type *uart) { return uart->USR; }
 
 /**
- * @brief 检查 UART 的 BUSY 状态位。
- *        Check the UART BUSY status bit.
- * @ingroup SGLL_UART
+ * @brief 检查 UART 的 BUSY 状态位 / Check the UART BUSY status bit.
  *
- * @param uart UART 寄存器实例。
- *        UART register instance.
- * @return UART 忙时返回 true。
- *         True while the UART is busy.
+ * @param uart UART 寄存器实例 / UART register instance.
+ * @return UART 忙时返回 true / True while the UART is busy.
  */
 static inline bool sgll_uart_is_busy(const UART_Type *uart) { return (uart->USR & UART_USR_BUSY_BIT) != 0U; }

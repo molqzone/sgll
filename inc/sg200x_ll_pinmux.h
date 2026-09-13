@@ -1,20 +1,3 @@
-/**
- * @file sg200x_ll_pinmux.h
- * @brief SG2002 引脚功能选择接口。
- *        SG2002 pin-function selection interfaces.
- * @ingroup SGLL_PINMUX
- *
- * @note TRM 第 10 章指向在线引脚表；具体功能值来自 SDK cv181x_pinlist_swconfig.h 和
- * cv181x_reg_fmux_gpio.h，并已与 LicheeRV Nano 引脚核对。 TRM Chapter 10 refers to an online pinout table;
- * function values come from SDK cv181x_pinlist_swconfig.h and cv181x_reg_fmux_gpio.h and were checked against
- * LicheeRV Nano pads.
- */
-
-/**
- * @defgroup SGLL_PINMUX 引脚复用 / Pin multiplexing
- * @ingroup SGLL
- */
-
 #pragma once
 
 #include <stdbool.h>
@@ -24,14 +7,10 @@
 #include "sg200x_ll_utils.h"
 
 /**
- * @brief 检查引脚复用功能值是否适合 3 位字段。
- *        Check whether a pin function fits the three-bit selector.
- * @ingroup SGLL_PINMUX
+ * @brief 检查引脚复用功能值是否适合 3 位字段 / Check whether a pin function fits the three-bit selector.
  *
- * @param function 引脚复用功能编码，范围为 0 到 7。
- *        Pin-function encoding from 0 through 7.
- * @return 功能值在 0 到 7 之间时为 true。
- *         True for function values from 0 through 7.
+ * @param function 引脚复用功能编码，范围为 0 到 7 / Pin-function encoding from 0 through 7.
+ * @return 功能值在 0 到 7 之间时为 true / True for function values from 0 through 7.
  */
 static inline bool sgll_pinmux_function_is_valid(uint32_t function)
 {
@@ -39,12 +18,9 @@ static inline bool sgll_pinmux_function_is_valid(uint32_t function)
 }
 
 /**
- * @brief 检查引脚选择寄存器偏移的范围和对齐。
- *        Check a pin-selector register offset for range and alignment.
- * @ingroup SGLL_PINMUX
+ * @brief 检查引脚选择寄存器偏移的范围和对齐 / Check a pin-selector register offset for range and alignment.
  *
- * @param offset 相对于相应寄存器块基址的字节偏移。
- *        Byte offset from the relevant register-block base.
+ * @param offset 相对于相应寄存器块基址的字节偏移 / Byte offset from the relevant register-block base.
  * @return 偏移按 4 字节对齐且位于选择器数组内时为 true。
  *         True for a four-byte-aligned offset within the selector array.
  */
@@ -54,14 +30,10 @@ static inline bool sgll_pinmux_offset_is_valid(uint32_t offset)
 }
 
 /**
- * @brief 设置一个引脚的复用功能并保留其他位。
- *        Set one pin's function while preserving the other bits.
- * @ingroup SGLL_PINMUX
+ * @brief 设置一个引脚的复用功能并保留其他位 / Set one pin's function while preserving the other bits.
  *
- * @param offset 相对于相应寄存器块基址的字节偏移。
- *        Byte offset from the relevant register-block base.
- * @param function 引脚复用功能编码，范围为 0 到 7。
- *        Pin-function encoding from 0 through 7.
+ * @param offset 相对于相应寄存器块基址的字节偏移 / Byte offset from the relevant register-block base.
+ * @param function 引脚复用功能编码，范围为 0 到 7 / Pin-function encoding from 0 through 7.
  * @return 成功返回 true；偏移或功能值无效时不写寄存器并返回 false。
  *         True on success; false without a register write for an invalid offset or function.
  */
@@ -77,14 +49,10 @@ static inline bool sgll_pinmux_function_set(uint32_t offset, uint32_t function)
 }
 
 /**
- * @brief 读取一个引脚的复用功能。
- *        Read one pin's selected function.
- * @ingroup SGLL_PINMUX
+ * @brief 读取一个引脚的复用功能 / Read one pin's selected function.
  *
- * @param offset 相对于相应寄存器块基址的字节偏移。
- *        Byte offset from the relevant register-block base.
- * @return 3 位功能值；偏移无效时返回 0。
- *         Three-bit function value, or zero for an invalid offset.
+ * @param offset 相对于相应寄存器块基址的字节偏移 / Byte offset from the relevant register-block base.
+ * @return 3 位功能值；偏移无效时返回 0 / Three-bit function value, or zero for an invalid offset.
  */
 static inline uint32_t sgll_pinmux_function_get(uint32_t offset)
 {
@@ -94,9 +62,7 @@ static inline uint32_t sgll_pinmux_function_get(uint32_t offset)
 }
 
 /**
- * @brief 选择 SD1 专用引脚组。
- *        Select the dedicated SD1 pad bank.
- * @ingroup SGLL_PINMUX
+ * @brief 选择 SD1 专用引脚组 / Select the dedicated SD1 pad bank.
  *
  * @note 清除 TOP SD1_SELECT 的选择位；置位时选择替代 MIPI 通路。
  *       Clear the selector in TOP SD1_SELECT; a set bit selects the alternate MIPI path.

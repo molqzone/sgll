@@ -1,24 +1,12 @@
-/**
- * @file sg200x_ll_spi.c
- * @brief SSI 默认配置、初始化和单实例复位。
- *        SSI defaults, initialization, and per-instance reset.
- *
- * @ingroup SGLL_SPI
- * @see SG2002 TRM 21.3.4.4、21.3.7；初始化和寄存器约束。Initialization and register constraints.
- */
-
 #include "sg200x_ll_spi.h"
 #include "sg200x_ll_csr.h"
 #include "sg200x_ll_rcc.h"
 
 /**
- * @brief 查找 SPI 实例对应的复位目标。
- *        Find the reset target corresponding to a SPI instance.
+ * @brief 查找 SPI 实例对应的复位目标 / Find the reset target corresponding to a SPI instance.
  *
- * @param spi SPI 寄存器实例地址。
- *        SPI register-instance address.
- * @return 匹配的目标；未知地址返回 RESET_NONE。
- *         Matching target, or RESET_NONE for an unknown address.
+ * @param spi SPI 寄存器实例地址 / SPI register-instance address.
+ * @return 匹配的目标；未知地址返回 RESET_NONE / Matching target, or RESET_NONE for an unknown address.
  */
 static rstgen_reset_target_t spi_reset_target(const spi_t *spi)
 {
